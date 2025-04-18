@@ -1,20 +1,26 @@
 "use client"
 
 import { Github } from "lucide-react"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 
 interface GitHubProps {
   isDarkMode?: boolean
 }
 
-// Update GitHub component to link to the user's profile
 export default function GitHub({ isDarkMode = true }: GitHubProps) {
   const textColor = isDarkMode ? "text-white" : "text-gray-800"
   const bgColor = isDarkMode ? "bg-gray-900" : "bg-white"
+  const hasOpenedRef = useRef(false)
 
   // Redirect to GitHub profile
   useEffect(() => {
-    window.open("https://github.com/daprior", "_blank")
+    // Only open once
+    if (!hasOpenedRef.current) {
+      hasOpenedRef.current = true
+
+      // Open GitHub profile in new tab
+      window.open("https://github.com/daprior", "_blank")
+    }
   }, [])
 
   return (

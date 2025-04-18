@@ -13,10 +13,8 @@ export default function MailApp({ isDarkMode = true }: MailProps) {
 
   // Open mailto link when the app is opened
   useEffect(() => {
-    // You can customize the email address, subject, and body here
-    const mailtoLink =
-      "mailto:mail@danielprior.dk?subject=Contact%20from%20Portfolio&body=Hello%2C%0A%0AI%20visited%20your%20portfolio%20and%20would%20like%20to%20connect."
-    window.open(mailtoLink, "_blank")
+    const mailtoLink = "mailto:mail@danielprior.dk"
+    window.location.href = mailtoLink
   }, [])
 
   return (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 
 interface YouTubeProps {
   isDarkMode?: boolean
@@ -9,12 +9,20 @@ interface YouTubeProps {
 export default function YouTube({ isDarkMode = true }: YouTubeProps) {
   const textColor = isDarkMode ? "text-white" : "text-gray-800"
   const bgColor = isDarkMode ? "bg-gray-900" : "bg-white"
+  const hasOpenedRef = useRef(false)
 
   // Open YouTube channel when the app is opened
   useEffect(() => {
-    // Replace with your actual YouTube channel URL
-    const youtubeUrl = "https://www.youtube.com/@DanielPrior0"
-    window.open(youtubeUrl, "_blank")
+    // Only open once
+    if (!hasOpenedRef.current) {
+      hasOpenedRef.current = true
+
+      // Your YouTube channel URL
+      const youtubeUrl = "https://www.youtube.com/@DanielPrior0"
+
+      // Open in new tab
+      window.open(youtubeUrl, "_blank")
+    }
   }, [])
 
   return (
