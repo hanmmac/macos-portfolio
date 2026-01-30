@@ -12,90 +12,43 @@ export default function Notes({ isDarkMode = true }: NotesProps) {
   // Update the notes state with enhanced content
   const [notes, setNotes] = useState([
     {
-      id: 1,
-      title: "About Me",
-      content: `# Daniel Prior
-Frontend Developer & Full Stack Engineer
-
-## Skills
-### Frontend
-- React/Next.js
-- Vue.js/Nuxt.js
-- TypeScript/JavaScript
-- Tailwind CSS/SCSS
-- UI/UX Design
-- Responsive Web Development
-- Vite/Webpack
-- Wordpress, Umbraco etc.
-
-### Backend
-- Node.js/Express
-- PHP/Laravel/Slim
-- Python/Django
-- Rust & GO (learning)
-- SQL (MySQL, PostgreSQL)
-- NoSQL (MongoDB)
-- RESTful APIs/GraphQL
-
-### Game Development
-- Unity/Unreal Engine
-- C# & C++
-- Game Design Principles
-- Game Mechanics & Systems
-- Blender 3D/3D Modeling
-- Animations for agricultural machinery and vehicles
-- Godot Engine
-
-### DevOps & Tools
-- Docker/Containerization
-- CI/CD Pipelines
-- Git/GitHub
-- Agile/Scrum Methodologies
-- AWS/Cloud Services
-- Linux/Unix
-
-## Experience
-Currently working as a Senior Full Stack Developer, focusing on building accessible, performant, and scalable web applications. Experienced in leading development teams and implementing best practices for modern web development.
-
-## Contact
-Email: mail@danielprior.dk
-GitHub: github.com/daprior
-Portfolio: danielprior.dev`,
-      date: "Today, 10:30 AM",
-    },
-    {
       id: 2,
       title: "Learning Goals",
       content: `# Learning Goals
 
-## Career & Independence
-- Network with like-minded professionals and mentors
-- Build a personal brand and online presence
-- Work on meaningful AI projects with real-world impact
-- Enhance knowledge in industries I'm passionate about (fintech, finance, web3 and automotive)
+## Career & Product Development
+- Keep building products and features that prioritize the data story and user metrics
+- Work on projects where data, AI, and user experience overlap
+- Focus on interpretability, thoughtful design, and responsible AI
+- Network with product developers, data scientists, and UX designers
 
 ## Technical Skills
-- Master Rust for performance-critical applications and systems programming
-- Improve Go proficiency for backend services and microservices
-- Deepen knowledge of AI/ML frameworks and practical applications
-- Make popular games with Unity and Unreal Engine
+- Deepen expertise in Python and SQL
+- Improve LLM integration and RAG system design
+- Enhance React/Next.js and frontend development skills
+- Learn more about production ML systems
 
 ## Personal Projects
-- Develop an indie game from concept to release
-- Build AI-powered tools that enhance creative workflows
-- Create open-source libraries that solve real problems
-- Contribute to projects I use and admire
-
-## Learning Approach
-- Focus on deep understanding rather than surface-level knowledge
-- Build complete projects rather than just tutorials and unfinished projects
-- Share knowledge and experiences with the community
-- Maintain a balance between breadth and depth of skills`,
+- Continue experimenting with AI prototyping tools (Figma AI, Orchid, Cursor)
+- Build lightweight React frontends for fast iteration
+- Create products that combine real data, real backends, and production constraints
+- Contribute to open-source projects in data science and product development`,
       date: "Yesterday, 3:15 PM",
+    },
+    {
+      id: 3,
+      title: "Learning Approach",
+      content: `# Learning Approach
+
+- Focus on building complete, production-ready projects
+- Stay creative while grounding work in real data and user needs
+- Experiment with new AI tools to automate work and prototype quickly
+- Share knowledge about data storytelling and product metrics`,
+      date: "Today, 2:30 PM",
     },
   ])
 
-  const [selectedNoteId, setSelectedNoteId] = useState(1)
+  const [selectedNoteId, setSelectedNoteId] = useState(2)
   const [editableContent, setEditableContent] = useState("")
 
   const selectedNote = notes.find((note) => note.id === selectedNoteId)
@@ -132,7 +85,7 @@ Portfolio: danielprior.dev`,
   return (
     <div className={`flex h-full ${bgColor} ${textColor}`}>
       {/* Sidebar */}
-      <div className={`w-64 ${sidebarBg} border-r ${borderColor} flex flex-col`}>
+      <div className={`w-48 ${sidebarBg} border-r ${borderColor} flex flex-col`}>
         <div className="p-3 border-b border-gray-700 flex justify-between items-center">
           <h2 className="font-medium">Notes</h2>
           <button className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-white">

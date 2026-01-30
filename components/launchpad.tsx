@@ -9,13 +9,14 @@ const launchpadApps = [
   { id: "mail", title: "Mail", icon: "/mail.png", component: "Mail" },
   { id: "vscode", title: "VS Code", icon: "/vscode.png", component: "VSCode" },
   { id: "notes", title: "Notes", icon: "/notes.png", component: "Notes" },
-  { id: "facetime", title: "FaceTime", icon: "/facetime.png", component: "FaceTime" },
   { id: "terminal", title: "Terminal", icon: "/terminal.png", component: "Terminal" },
   { id: "github", title: "GitHub", icon: "/github.png", component: "GitHub" },
-  { id: "youtube", title: "YouTube", icon: "/youtube.png", component: "YouTube" },
+  { id: "linkedin", title: "LinkedIn", icon: "/new_linkedin_icon.png", component: "LinkedIn" },
   { id: "spotify", title: "Spotify", icon: "/spotify.png", component: "Spotify" },
   { id: "snake", title: "Snake", icon: "/snake.png", component: "Snake" },
   { id: "weather", title: "Weather", icon: "/weather.png", component: "Weather" },
+  { id: "analytics", title: "Analytics", icon: "/chart-679.png", component: "Analytics" },
+  { id: "chat", title: "Mac AI", icon: "/face-id.svg", component: "ChatApp" },
 ]
 
 interface LaunchpadProps {
@@ -41,12 +42,60 @@ export default function Launchpad({ onAppClick, onClose }: LaunchpadProps) {
   }, [searchTerm])
 
   const handleAppClick = (app: (typeof launchpadApps)[0]) => {
+    // Special positioning for Spotify - top right corner, smaller size
+    const isSpotify = app.id === "spotify"
+    const spotifyWidth = 240
+    const spotifyHeight = 250
+    const spotifyX = typeof window !== "undefined" ? window.innerWidth - spotifyWidth - 20 : 100
+    const spotifyY = 40 // Below menubar (26px) + padding
+
+    // Special size for Safari - responsive to screen
+    const isSafari = app.id === "safari"
+    const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1920
+    const screenHeight = typeof window !== "undefined" ? window.innerHeight : 1080
+    const padding = 40
+    const menubarHeight = 26
+    const dockHeight = 80
+    const safariWidth = Math.min(800, screenWidth - padding * 2)
+    const safariHeight = Math.min(1000, screenHeight - menubarHeight - dockHeight - padding * 2)
+    const safariX = padding + 50 // Farther to the left, near the left edge
+    const safariY = menubarHeight + 20 // Near the top
+
+    // Special size for Notes - smaller window
+    const isNotes = app.id === "notes"
+    const notesWidth = 600
+    const notesHeight = 500
+
+    // Special size for Analytics - larger window for dashboard
+    const isAnalytics = app.id === "analytics"
+    const analyticsWidth = 1000
+    const analyticsHeight = 600
+
+    // Special size for Chat - smaller window
+    const isChat = app.id === "chat"
+    const chatWidth = 550
+    const chatHeight = 500
+
     onAppClick({
       id: app.id,
       title: app.title,
       component: app.component,
-      position: { x: Math.random() * 200 + 100, y: Math.random() * 100 + 50 },
-      size: { width: 800, height: 600 },
+      position: isSpotify 
+        ? { x: spotifyX, y: spotifyY }
+        : isSafari
+        ? { x: safariX, y: safariY }
+        : { x: Math.random() * 200 + 100, y: Math.random() * 100 + 50 },
+      size: isSpotify 
+        ? { width: spotifyWidth, height: spotifyHeight }
+        : isSafari
+        ? { width: safariWidth, height: safariHeight }
+        : isNotes
+        ? { width: notesWidth, height: notesHeight }
+        : isAnalytics
+        ? { width: analyticsWidth, height: analyticsHeight }
+        : isChat
+        ? { width: chatWidth, height: chatHeight }
+        : { width: 800, height: 600 },
     })
     onClose()
   }
@@ -99,9 +148,9 @@ export default function Launchpad({ onAppClick, onClose }: LaunchpadProps) {
               onClick={() => handleAppClick(app)}
             >
               <div className="w-16 h-16 flex items-center justify-center mb-2 rounded-xl group-hover:bg-white/20 transition-colors">
-                <img src={app.icon || "/placeholder.svg"} alt={app.title} className="w-12 h-12 object-contain" />
+                <img src={app.icon || "/placeholder.svg"} alt={app.title} className="w-12 h-12 object-contain" style={app.id === "analytics" ? { transform: "scale(0.9)" } : undefined} />
               </div>
-              <span className="text-white text-sm text-center">{app.title}</span>
+              <span className="text-white text-sm text-center font-sans">{app.title}</span>
             </div>
           ))}
         </div>

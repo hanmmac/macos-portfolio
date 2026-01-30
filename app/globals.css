@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Petit+Formal+Script&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,9 +16,14 @@
   --background-end-rgb: 0, 0, 0;
 }
 
+* {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -36,4 +43,31 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(156, 163, 175, 0.7);
+}
+
+/* Chat thinking dots animation */
+@keyframes thinking-dot {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.thinking-dot-1 {
+  animation: thinking-dot 1.4s infinite;
+  animation-delay: 0s;
+}
+
+.thinking-dot-2 {
+  animation: thinking-dot 1.4s infinite;
+  animation-delay: 0.2s;
+}
+
+.thinking-dot-3 {
+  animation: thinking-dot 1.4s infinite;
+  animation-delay: 0.4s;
 }

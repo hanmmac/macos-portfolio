@@ -3,33 +3,62 @@
 import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
-import { X, Minus, ArrowRightIcon as ArrowsMaximize } from "lucide-react"
+import { X, Minus, ArrowRightIcon as ArrowsMaximize, ZoomIn, ZoomOut, ExternalLink } from "lucide-react"
 import type { AppWindow } from "@/types"
+import { useIsMobile } from "@/hooks/use-mobile"
 import Notes from "@/components/apps/notes"
 import GitHub from "@/components/apps/github"
 import Safari from "@/components/apps/safari"
 import VSCode from "@/components/apps/vscode"
-import FaceTime from "@/components/apps/facetime"
 import Terminal from "@/components/apps/terminal"
 import Mail from "@/components/apps/mail"
 import YouTube from "@/components/apps/youtube"
+import LinkedIn from "@/components/apps/linkedin"
 import Spotify from "@/components/apps/spotify"
 import Snake from "@/components/apps/snake"
 import Weather from "@/components/apps/weather"
+import Files from "@/components/apps/files"
+import IntelligentAIJournal from "@/components/apps/intelligent-ai-journal"
+import VideoPlayer from "@/components/apps/video-player"
+import BiasDoctorLinks from "@/components/apps/bias-doctor-links"
+import BiasDoctorFinalReport from "@/components/apps/bias-doctor-final-report"
+import Analytics from "@/components/apps/analytics"
+import HousingAffordability from "@/components/apps/housing-affordability"
+import GraphInvestment from "@/components/apps/graph-investment"
+import GraphInvestmentLinks from "@/components/apps/graph-investment-links"
+import DiloSpanish from "@/components/apps/dilo-spanish"
+import DiloSpanishLinks from "@/components/apps/dilo-spanish-links"
+import IntelligentAIJournalLinks from "@/components/apps/intelligent-ai-journal-links"
+import ProjectDescription from "@/components/apps/project-description"
+import ChatApp from "@/components/apps/Chat"
 
 
-const componentMap: Record<string, React.ComponentType<{ isDarkMode?: boolean }>> = {
+const componentMap: Record<string, React.ComponentType<{ isDarkMode?: boolean; onClose?: () => void; onOpenProject?: (projectName: string) => void; onOpenVideo?: () => void; onMinimizeWindow?: () => void; projectId?: string }>> = {
   Notes,
   GitHub,
   Safari,
   VSCode,
-  FaceTime,
   Terminal,
   Mail,
   YouTube,
+  LinkedIn,
   Spotify,
   Snake,
   Weather,
+  Files,
+  IntelligentAIJournal,
+  VideoPlayer,
+  BiasDoctorLinks,
+  BiasDoctorFinalReport,
+  Analytics,
+  HousingAffordability,
+  GraphInvestment,
+  GraphInvestmentLinks,
+  DiloSpanish,
+  DiloSpanishLinks,
+  IntelligentAIJournalLinks,
+  ProjectDescription,
+  ChatApp,
 }
 
 interface WindowProps {
@@ -37,10 +66,16 @@ interface WindowProps {
   isActive: boolean
   onClose: () => void
   onFocus: () => void
+  onMinimize: () => void
+  isMinimized: boolean
   isDarkMode: boolean
+  onOpenProject?: (projectName: string) => void
+  onOpenVideo?: () => void
+  onMinimizeWindow?: () => void
+  zIndex?: number
 }
 
-export default function Window({ window, isActive, onClose, onFocus, isDarkMode }: WindowProps) {
+export default function Window({ window, isActive, onClose, onFocus, onMinimize, isMinimized, isDarkMode, onOpenProject, onOpenVideo, onMinimizeWindow, zIndex = 30 }: WindowProps) {
   const [position, setPosition] = useState(window.position)
   const [size, setSize] = useState(window.size)
   const [isDragging, setIsDragging] = useState(false)
@@ -51,22 +86,47 @@ export default function Window({ window, isActive, onClose, onFocus, isDarkMode 
   const [resizeDirection, setResizeDirection] = useState<string | null>(null)
   const [resizeStartPos, setResizeStartPos] = useState({ x: 0, y: 0 })
   const [resizeStartSize, setResizeStartSize] = useState({ width: 0, height: 0 })
+  // Set default zoom to 90% for project resources windows, 100% for others
+  const isProjectResources = window.component === "BiasDoctorLinks" || window.component === "GraphInvestmentLinks" || window.component === "IntelligentAIJournalLinks"
+  const [zoomLevel, setZoomLevel] = useState(isProjectResources ? 90 : 100)
+  const isMobile = useIsMobile()
 
   const windowRef = useRef<HTMLDivElement>(null)
 
   const AppComponent = componentMap[window.component]
+  const isSpotify = window.component === "Spotify"
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
+      // Prevent dragging for Spotify
+      if (isDragging && !isSpotify) {
+        const newY = Math.max(24, e.clientY - dragOffset.y) // Prevent going above menu bar (24px height)
+        
+        // Get viewport dimensions
+        const viewportWidth = globalThis.window.innerWidth
+        const viewportHeight = globalThis.window.innerHeight
+        
+        // Calculate boundaries - window can only go halfway off screen
+        const minX = -size.width / 2 // Can go halfway off left
+        const maxX = viewportWidth - size.width / 2 // Can go halfway off right
+        const minY = 24 // Can't go above menu bar
+        const maxY = viewportHeight - size.height / 2 // Can go halfway off bottom
+        
+        const newX = Math.max(minX, Math.min(maxX, e.clientX - dragOffset.x))
+        const constrainedY = Math.max(minY, Math.min(maxY, newY))
+        
         setPosition({
-          x: e.clientX - dragOffset.x,
-          y: e.clientY - dragOffset.y,
+          x: newX,
+          y: constrainedY,
         })
       } else if (isResizing && resizeDirection) {
         e.preventDefault()
         const dx = e.clientX - resizeStartPos.x
         const dy = e.clientY - resizeStartPos.y
+
+        // Get viewport dimensions
+        const viewportWidth = globalThis.window.innerWidth
+        const viewportHeight = globalThis.window.innerHeight
 
         let newWidth = resizeStartSize.width
         let newHeight = resizeStartSize.height
@@ -77,28 +137,86 @@ export default function Window({ window, isActive, onClose, onFocus, isDarkMode 
         const minWidth = 300
         const minHeight = 200
 
+        // Handle horizontal resizing (east/west)
         if (resizeDirection.includes("e")) {
-          newWidth = Math.max(minWidth, resizeStartSize.width + dx)
-        }
-        if (resizeDirection.includes("s")) {
-          newHeight = Math.max(minHeight, resizeStartSize.height + dy)
-        }
-        if (resizeDirection.includes("w")) {
+          // Resizing from right edge
+          const proposedWidth = resizeStartSize.width + dx
+          const rightEdge = position.x + proposedWidth
+          const maxAllowedRight = viewportWidth + resizeStartSize.width / 2
+          
+          if (rightEdge <= maxAllowedRight) {
+            newWidth = Math.max(minWidth, proposedWidth)
+          } else {
+            // Constrain to max allowed right edge
+            newWidth = Math.max(minWidth, maxAllowedRight - position.x)
+          }
+        } else if (resizeDirection.includes("w")) {
+          // Resizing from left edge
           const proposedWidth = resizeStartSize.width - dx
           if (proposedWidth >= minWidth) {
-            newWidth = proposedWidth
-            newX = position.x + dx
+            const proposedX = position.x + dx
+            const minX = -proposedWidth / 2
+            
+            // Ensure the new position doesn't go too far left
+            if (proposedX >= minX) {
+              newWidth = proposedWidth
+              newX = proposedX
+            } else {
+              // Constrain to minimum X position
+              newX = minX
+              newWidth = resizeStartSize.width + (position.x - minX)
+            }
+            
+            // Additional check: ensure right edge doesn't go too far off screen
+            const rightEdge = newX + newWidth
+            const maxAllowedRight = viewportWidth + newWidth / 2
+            if (rightEdge > maxAllowedRight) {
+              newWidth = maxAllowedRight - newX
+            }
           }
         }
-        if (resizeDirection.includes("n")) {
+
+        // Handle vertical resizing (south/north)
+        if (resizeDirection.includes("s")) {
+          // Resizing from bottom edge
+          const proposedHeight = resizeStartSize.height + dy
+          const bottomEdge = position.y + proposedHeight
+          const maxAllowedBottom = viewportHeight + resizeStartSize.height / 2
+          
+          if (bottomEdge <= maxAllowedBottom) {
+            newHeight = Math.max(minHeight, proposedHeight)
+          } else {
+            // Constrain to max allowed bottom edge
+            newHeight = Math.max(minHeight, maxAllowedBottom - position.y)
+          }
+        } else if (resizeDirection.includes("n")) {
+          // Resizing from top edge
           const proposedHeight = resizeStartSize.height - dy
           if (proposedHeight >= minHeight) {
-            newHeight = proposedHeight
-            newY = position.y + dy
+            const proposedY = position.y + dy
+            const minY = 24
+            
+            // Ensure the new position doesn't go above menu bar
+            if (proposedY >= minY) {
+              newHeight = proposedHeight
+              newY = proposedY
+            } else {
+              // Constrain to minimum Y position (menu bar)
+              newY = minY
+              newHeight = resizeStartSize.height + (position.y - minY)
+            }
+            
+            // Additional check: ensure bottom edge doesn't go too far off screen
+            const bottomEdge = newY + newHeight
+            const maxAllowedBottom = viewportHeight + newHeight / 2
+            if (bottomEdge > maxAllowedBottom) {
+              newHeight = maxAllowedBottom - newY
+            }
           }
         }
 
         setSize({ width: newWidth, height: newHeight })
+        // Update position for west and north resizing
         if (resizeDirection.includes("w") || resizeDirection.includes("n")) {
           setPosition({ x: newX, y: newY })
         }
@@ -123,7 +241,7 @@ export default function Window({ window, isActive, onClose, onFocus, isDarkMode 
   }, [isDragging, dragOffset, isResizing, resizeDirection, resizeStartPos, resizeStartSize, position])
 
   const handleTitleBarMouseDown = (e: React.MouseEvent) => {
-    if (isMaximized) return
+    if (isMaximized || isSpotify || isMobile) return // Prevent dragging for Spotify and on mobile
 
     // Prevent dragging when clicking on buttons
     if ((e.target as HTMLElement).closest(".window-controls")) {
@@ -142,6 +260,8 @@ export default function Window({ window, isActive, onClose, onFocus, isDarkMode 
   const handleResizeMouseDown = (e: React.MouseEvent, direction: string) => {
     e.preventDefault()
     e.stopPropagation()
+    
+    if (isSpotify || isMobile) return // Prevent resizing for Spotify and on mobile
 
     setIsResizing(true)
     setResizeDirection(direction)
@@ -167,12 +287,12 @@ export default function Window({ window, isActive, onClose, onFocus, isDarkMode 
       setPreMaximizeState({ position, size })
 
       // Get the available space (accounting for menubar)
-      const availableHeight = window.innerHeight - 26 // 6px for menubar + 20px padding
+      const availableHeight = globalThis.window.innerHeight - 26 // 6px for menubar + 20px padding
 
       // Maximize
       setPosition({ x: 0, y: 26 }) // Position below menubar
       setSize({
-        width: window.innerWidth,
+        width: globalThis.window.innerWidth,
         height: availableHeight - 70, // Account for dock
       })
     }
@@ -180,12 +300,25 @@ export default function Window({ window, isActive, onClose, onFocus, isDarkMode 
     setIsMaximized(!isMaximized)
   }
 
-  // Make minimize do the same as close
   const handleMinimize = () => {
-    onClose()
+    onMinimize()
   }
 
-  const titleBarClass = isDarkMode
+  const handleZoomIn = () => {
+    setZoomLevel((prev) => Math.min(prev + 10, 200))
+  }
+
+  const handleZoomOut = () => {
+    setZoomLevel((prev) => Math.max(prev - 10, 50))
+  }
+
+  const isChat = window.component === "ChatApp"
+  const isFiles = window.component === "Files"
+  const isVideoPlayer = window.component === "VideoPlayer"
+
+  const titleBarClass = isChat
+    ? "backdrop-blur-md bg-white/10 border-b border-white/20"
+    : isDarkMode
     ? isActive
       ? "bg-gray-800"
       : "bg-gray-900"
@@ -196,88 +329,182 @@ export default function Window({ window, isActive, onClose, onFocus, isDarkMode 
   const contentBgClass = isDarkMode ? "bg-gray-900" : "bg-white"
   const textClass = isDarkMode ? "text-white" : "text-gray-800"
   const resizeBorderClass = isDarkMode ? "border-gray-700" : "border-gray-300"
+  
+  // Don't render if minimized
+  if (isMinimized) {
+    return null
+  }
+  
+  // Use dynamic z-index if provided, otherwise fall back to default
+  const dynamicZIndex = zIndex || 30
+  const isGlassWindow = isSpotify || isChat
+  
+  // Calculate Spotify position using right/top instead of left/top
+  const spotifySpacing = 20
+  const spotifyTop = 40
 
   return (
     <div
       ref={windowRef}
-      className={`absolute rounded-lg overflow-hidden shadow-2xl transition-shadow ${isActive ? "shadow-2xl z-10" : "shadow-lg z-0"}`}
-      style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        width: `${size.width}px`,
-        height: `${size.height}px`,
-      }}
+      className={`${isSpotify ? "fixed" : "absolute"} ${isMobile ? "rounded-t-3xl" : "rounded-lg"} overflow-hidden transition-shadow ${
+        isGlassWindow 
+          ? "backdrop-blur-xl bg-white/5 dark:bg-black/20 border border-white/30 dark:border-white/30 shadow-2xl"
+          : isVideoPlayer && isActive
+          ? "shadow-2xl"
+          : isActive ? "shadow-2xl" : "shadow-lg"
+      }`}
+      style={
+        isSpotify
+          ? {
+              right: `${spotifySpacing}px`,
+              top: `${spotifyTop}px`,
+              width: `${size.width}px`,
+              height: `${size.height}px`,
+              zIndex: dynamicZIndex,
+            }
+          : {
+              left: `${position.x}px`,
+              top: `${position.y}px`,
+              width: `${size.width}px`,
+              height: `${size.height}px`,
+              zIndex: dynamicZIndex,
+            }
+      }
       onClick={onFocus}
     >
-      {/* Title bar */}
-      <div className={`h-8 flex items-center px-3 ${titleBarClass}`} onMouseDown={handleTitleBarMouseDown}>
-        <div className="window-controls flex items-center space-x-2 mr-4">
-          <button
-            className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center"
-            onClick={onClose}
-          >
-            <X className="w-2 h-2 text-red-800 opacity-0 hover:opacity-100" />
-          </button>
-          <button
-            className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 flex items-center justify-center"
-            onClick={handleMinimize}
-          >
-            <Minus className="w-2 h-2 text-yellow-800 opacity-0 hover:opacity-100" />
-          </button>
-          <button
-            className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center"
-            onClick={toggleMaximize}
-          >
-            <ArrowsMaximize className="w-2 h-2 text-green-800 opacity-0 hover:opacity-100" />
-          </button>
+      {/* Title bar - hide for Spotify only */}
+      {window.component !== "Spotify" && (
+        <div className={`${isMobile ? "h-12" : "h-8"} flex items-center ${isMobile ? "px-4" : "px-3"} ${isMobile ? "bg-white/10 backdrop-blur-xl border-b border-white/20" : titleBarClass}`} onMouseDown={handleTitleBarMouseDown}>
+          {isMobile ? (
+            // iOS-style header
+            <>
+              <button
+                onClick={onClose}
+                className="text-white text-base font-medium active:opacity-70 touch-manipulation"
+              >
+                Close
+              </button>
+              <div className={`flex-1 text-center text-base font-semibold ${isChat ? "text-white" : "text-white"} font-sans`}>
+                {window.title}
+              </div>
+              <div className="w-12"></div>
+            </>
+          ) : (
+            // Desktop-style header
+            <>
+              <div className="window-controls flex items-center space-x-2 mr-4">
+                <button
+                  className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center"
+                  onClick={onClose}
+                >
+                  <X className="w-2 h-2 text-red-800 opacity-0 hover:opacity-100" />
+                </button>
+                <button
+                  className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 flex items-center justify-center"
+                  onClick={handleMinimize}
+                >
+                  <Minus className="w-2 h-2 text-yellow-800 opacity-0 hover:opacity-100" />
+                </button>
+                {!isFiles && (
+                  <button
+                    className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center"
+                    onClick={toggleMaximize}
+                  >
+                    <ArrowsMaximize className="w-2 h-2 text-green-800 opacity-0 hover:opacity-100" />
+                  </button>
+                )}
+              </div>
+
+              <div className={`flex-1 text-center text-sm font-medium truncate ${isChat ? "text-white" : textClass} font-sans`}>{window.title}</div>
+            </>
+          )}
+
+          {!isMobile && (
+            <div className="flex items-center space-x-1 window-controls">
+              {/* External link button for IntelligentAIJournal */}
+              {window.component === "IntelligentAIJournal" && (
+                <button
+                  className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs ${isDarkMode ? "hover:bg-gray-700 text-white" : "hover:bg-gray-200 text-gray-800"}`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    globalThis.window.open("https://www.ischool.berkeley.edu/projects/2025/refraime", "_blank", "noopener,noreferrer")
+                  }}
+                  title="Open project page"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span>Open in Browser</span>
+                </button>
+              )}
+              {/* External link button for DiloSpanish */}
+              {window.component === "DiloSpanish" && (
+                <button
+                  className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs ${isDarkMode ? "hover:bg-gray-700 text-white" : "hover:bg-gray-200 text-gray-800"}`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    globalThis.window.open("https://dilo-spanish-app.vercel.app/", "_blank", "noopener,noreferrer")
+                  }}
+                  title="Open project page"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span>Open in Browser</span>
+                </button>
+              )}
+              <button
+                className={`p-1 rounded ${isChat ? "hover:bg-white/20 text-white" : isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleZoomOut()
+                }}
+                title="Zoom Out"
+              >
+                <ZoomOut className="w-3 h-3" />
+              </button>
+              <span className={`text-xs px-1 ${isChat ? "text-white" : ""}`}>{zoomLevel}%</span>
+              <button
+                className={`p-1 rounded ${isChat ? "hover:bg-white/20 text-white" : isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleZoomIn()
+                }}
+                title="Zoom In"
+              >
+                <ZoomIn className="w-3 h-3" />
+              </button>
+            </div>
+          )}
         </div>
-
-        <div className={`flex-1 text-center text-sm font-medium truncate ${textClass}`}>{window.title}</div>
-
-        <div className="w-16">{/* Spacer to balance the title */}</div>
-      </div>
+      )}
 
       {/* Window content */}
-      <div className={`${contentBgClass} h-[calc(100%-2rem)] overflow-auto`}>
-        {AppComponent ? <AppComponent isDarkMode={isDarkMode} /> : <div className="p-4">Content not available</div>}
+      <div 
+        className={`${isGlassWindow ? "bg-transparent" : contentBgClass} ${isSpotify ? "h-full" : isMobile ? "h-[calc(100%-3rem)]" : "h-[calc(100%-2rem)]"} overflow-auto`}
+        style={{ zoom: isMobile ? "100%" : `${zoomLevel}%` }}
+      >
+        {AppComponent ? (
+          isSpotify ? (
+            <AppComponent isDarkMode={isDarkMode} onClose={onClose} />
+          ) : window.component === "Files" ? (
+            <AppComponent isDarkMode={isDarkMode} onOpenProject={onOpenProject} onMinimizeWindow={onMinimizeWindow} />
+          ) : window.component === "IntelligentAIJournal" ? (
+            <AppComponent isDarkMode={isDarkMode} />
+          ) : window.component === "IntelligentAIJournalLinks" ? (
+            <AppComponent isDarkMode={isDarkMode} onOpenVideo={onOpenVideo} />
+          ) : window.component === "ProjectDescription" ? (
+            <AppComponent isDarkMode={isDarkMode} projectId={window.id} />
+          ) : (
+            <AppComponent isDarkMode={isDarkMode} />
+          )
+        ) : (
+          <div className="p-4">Content not available</div>
+        )}
       </div>
 
-      {/* Resize handles */}
-      {!isMaximized && (
+      {/* Resize handles - hidden on mobile */}
+      {!isMaximized && !isFiles && !isSpotify && !isMobile && (
         <>
-          {/* Corner resize handles */}
+          {/* Right edge resize handle only */}
           <div
-            className="absolute top-0 left-0 w-4 h-4 cursor-nw-resize z-20"
-            onMouseDown={(e) => handleResizeMouseDown(e, "nw")}
-          />
-          <div
-            className="absolute top-0 right-0 w-4 h-4 cursor-ne-resize z-20"
-            onMouseDown={(e) => handleResizeMouseDown(e, "ne")}
-          />
-          <div
-            className="absolute bottom-0 left-0 w-4 h-4 cursor-sw-resize z-20"
-            onMouseDown={(e) => handleResizeMouseDown(e, "sw")}
-          />
-          <div
-            className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize z-20"
-            onMouseDown={(e) => handleResizeMouseDown(e, "se")}
-          />
-
-          {/* Edge resize handles */}
-          <div
-            className="absolute top-0 left-4 right-4 h-2 cursor-n-resize z-20"
-            onMouseDown={(e) => handleResizeMouseDown(e, "n")}
-          />
-          <div
-            className="absolute bottom-0 left-4 right-4 h-2 cursor-s-resize z-20"
-            onMouseDown={(e) => handleResizeMouseDown(e, "s")}
-          />
-          <div
-            className="absolute left-0 top-4 bottom-4 w-2 cursor-w-resize z-20"
-            onMouseDown={(e) => handleResizeMouseDown(e, "w")}
-          />
-          <div
-            className="absolute right-0 top-4 bottom-4 w-2 cursor-e-resize z-20"
+            className="absolute right-0 top-0 bottom-0 w-2 cursor-e-resize z-20"
             onMouseDown={(e) => handleResizeMouseDown(e, "e")}
           />
         </>

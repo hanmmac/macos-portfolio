@@ -4,8 +4,10 @@ import { useState, useEffect } from "react"
 import BootScreen from "@/components/boot-screen"
 import LoginScreen from "@/components/login-screen"
 import Desktop from "@/components/desktop"
+import MobileDesktop from "@/components/mobile-desktop"
 import SleepScreen from "@/components/sleep-screen"
 import ShutdownScreen from "@/components/shutdown-screen"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 type SystemState = "booting" | "login" | "desktop" | "sleeping" | "shutdown" | "restarting"
 
@@ -13,6 +15,7 @@ export default function Home() {
   const [systemState, setSystemState] = useState<SystemState>("booting")
   const [isDarkMode, setIsDarkMode] = useState(false) // Default to light mode
   const [screenBrightness, setScreenBrightness] = useState(90)
+  const isMobile = useIsMobile()
 
   // Simulate boot sequence
   useEffect(() => {
@@ -97,7 +100,18 @@ export default function Home() {
         return <LoginScreen onLogin={handleLogin} isDarkMode={isDarkMode} onToggleDarkMode={toggleDarkMode} />
 
       case "desktop":
-        return (
+        return isMobile ? (
+          <MobileDesktop
+            onLogout={handleLogout}
+            onSleep={handleSleep}
+            onShutdown={handleShutdown}
+            onRestart={handleRestart}
+            initialDarkMode={isDarkMode}
+            onToggleDarkMode={toggleDarkMode}
+            initialBrightness={screenBrightness}
+            onBrightnessChange={updateBrightness}
+          />
+        ) : (
           <Desktop
             onLogout={handleLogout}
             onSleep={handleSleep}

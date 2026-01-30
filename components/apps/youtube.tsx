@@ -17,11 +17,8 @@ export default function YouTube({ isDarkMode = true }: YouTubeProps) {
     if (!hasOpenedRef.current) {
       hasOpenedRef.current = true
 
-      // Your YouTube channel URL
-      const youtubeUrl = "https://www.youtube.com/@DanielPrior0"
-
-      // Open in new tab
-      window.open(youtubeUrl, "_blank")
+      // Open Hannah's site in a new tab (legacy app slot)
+      window.open("https://hannah-marie-macdonald.com", "_blank")
     }
   }, [])
 

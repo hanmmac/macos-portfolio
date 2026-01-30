@@ -33,7 +33,7 @@ export default function Terminal({ isDarkMode = true }: TerminalProps) {
       // Initial welcome message
       setHistory([
         "Last login: " + new Date().toLocaleString(),
-        "Welcome to macOS Terminal",
+        "Welcome to Hannah's Terminal",
         "Type 'help' to see available commands",
         "",
       ])
@@ -92,7 +92,7 @@ export default function Terminal({ isDarkMode = true }: TerminalProps) {
     const mainCommand = args[0]
 
     // Add command to history
-    setHistory((prev) => [...prev, `daniel@macbook-pro ~ $ ${cmd}`, ""])
+    setHistory((prev) => [...prev, `hannah@macbook-pro ~ $ ${cmd}`, ""])
 
     // Process command
     switch (mainCommand) {
@@ -131,25 +131,22 @@ export default function Terminal({ isDarkMode = true }: TerminalProps) {
         break
 
       case "whoami":
-        setHistory((prev) => [...prev, "daniel", ""])
+        setHistory((prev) => [...prev, "hannah", ""])
         break
 
       case "about":
         setHistory((prev) => [
           ...prev,
-          "┌─────────────────────────────────────┐",
-          "│ Daniel Prior                        │",
-          "│ Frontend Developer & UI/UX Designer │",
-          "└─────────────────────────────────────┘",
+          "┌─────────────────────────────────────────────┐",
+          "│ Hannah MacDonald                            │",
+          "│ Data Scientist & Product Developer         │",
+          "└─────────────────────────────────────────────┘",
           "",
-          "I'm a passionate web developer with expertise in",
-          "creating beautiful, responsive, and user-friendly",
-          "web applications. I love working with modern",
-          "frameworks and technologies to build",
-          "seamless user experiences. I have a strong",
-          "background in both frontend and backend",
-          "development, and I'm always eager to learn",
-          "new skills and improve my craft.",
+          "Recent UC Berkeley MIDS grad focused on applied stats,",
+          "machine learning, and data engineering.",
+          "",
+          "I build products that get used by keeping the data story",
+          "and user metrics front and center.",
           "",
         ])
         break
@@ -157,45 +154,36 @@ export default function Terminal({ isDarkMode = true }: TerminalProps) {
         case "skills":
           setHistory((prev) => [
             ...prev,
-            "┌──────────────┐",
-            "│   Skills     │",
-            "└──────────────┘",
+            "┌─────────────────────────────────────┐",
+            "│   Technical Skills                  │",
+            "└─────────────────────────────────────┘",
             "",
-            "Frontend:",
-            "• React / Next.js",
-            "• Vue.js / Nuxt.js",
-            "• TypeScript / JavaScript",
-            "• Tailwind CSS / SCSS",
-            "• UI/UX Design",
-            "• Responsive Web Development",
-            "• Vite / Webpack",
-            "• WordPress, Umbraco etc.",
+            "Data Science & Analytics:",
+            "• Python (pandas, numpy, scipy, matplotlib, seaborn)",
+            "• R (tidyverse, ggplot2, statistical modeling)",
+            "• SQL (PostgreSQL, complex queries, data modeling)",
+            "• Statistical Analysis & Experimental Design",
+            "• Data Visualization & A/B Testing",
+            "• Product Metrics & User Analytics",
             "",
-            "Backend:",
-            "• Node.js / Express",
-            "• PHP / Laravel / Slim",
-            "• Python / Django",
-            "• Rust & Go (learning)",
-            "• SQL (MySQL, PostgreSQL)",
-            "• NoSQL (MongoDB)",
-            "• RESTful APIs / GraphQL",
+            "Machine Learning & AI:",
+            "• Scikit-learn, TensorFlow, PyTorch",
+            "• NLP & LLMs (OpenAI APIs, prompt engineering)",
+            "• RAG Systems & Vector Databases",
+            "• Model Interpretability & Validation",
+            "• Feature Engineering & EDA",
             "",
-            "Game Development:",
-            "• Unity / Unreal Engine",
-            "• C# & C++",
-            "• Game Design Principles",
-            "• Game Mechanics & Systems",
-            "• Blender 3D / 3D Modeling",
-            "• Animations for agri machinery & vehicles",
-            "• Godot Engine",
+            "Data Engineering & Databases:",
+            "• PostgreSQL & Supabase",
+            "• Neo4j (Graph Databases, Cypher)",
+            "• ETL Pipelines & Data Modeling",
+            "• Graph Algorithms (PageRank, community detection)",
             "",
-            "DevOps & Tools:",
-            "• Docker / Containerization",
-            "• CI/CD Pipelines",
-            "• Git / GitHub",
-            "• Agile / Scrum Methodologies",
-            "• AWS / Cloud Services",
-            "• Linux / Unix",
+            "Product & Engineering:",
+            "• React, Next.js, JavaScript, TypeScript",
+            "• Streamlit & Lightweight Frontends",
+            "• Product Development & UX Design",
+            "• Git, GitHub, Agile Methodologies",
             "",
           ])
           break
@@ -207,10 +195,10 @@ export default function Terminal({ isDarkMode = true }: TerminalProps) {
           "│ Contact │",
           "└─────────┘",
           "",
-          "Email: mail@danielprior.dk",
-          "GitHub: github.com/daprior",
-          "LinkedIn: linkedin.com/in/daniel-prior-53a679195/",
-          "Website: danielprior.dev",
+          "Email: hannahmarief15@gmail.com",
+          "GitHub: github.com/hanmmac",
+          "LinkedIn: linkedin.com/in/hannah-marie-macdonald/",
+          "Website: hannah-marie-macdonald.com",
           "",
         ])
         break
@@ -234,7 +222,7 @@ export default function Terminal({ isDarkMode = true }: TerminalProps) {
       ))}
 
       <div className="flex">
-        <span className="mr-2">daniel@macbook-pro ~ $</span>
+        <span className="mr-2">hannah@macbook-pro ~ $</span>
         <input
           ref={inputRef}
           type="text"

@@ -16,6 +16,8 @@ interface MenubarProps {
   onControlCenterClick: () => void
   isDarkMode: boolean
   activeWindow: { id: string; title: string } | null
+  onSpotifyClick?: () => void
+  hasSpotifyOpen?: boolean
 }
 
 export default function Menubar({
@@ -28,6 +30,8 @@ export default function Menubar({
   onControlCenterClick,
   isDarkMode,
   activeWindow,
+  onSpotifyClick,
+  hasSpotifyOpen,
 }: MenubarProps) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const [batteryLevel, setBatteryLevel] = useState(100)
@@ -124,15 +128,19 @@ export default function Menubar({
   return (
     <div
       ref={menuRef}
-      className={`fixed top-0 left-0 right-0 h-6 ${menuBgClass} z-50 flex items-center px-4 ${textClass} text-sm`}
+      className={`fixed top-0 left-0 right-0 h-6 ${menuBgClass} z-50 flex items-center px-4 ${textClass} text-xs font-sans`}
     >
       <div className="flex-1 flex items-center">
         <button
           className="flex items-center mr-4 hover:bg-white/10 px-2 py-0.5 rounded"
           onClick={() => toggleMenu("apple")}
         >
-          <AppleIcon className="w-4 h-4" />
+          <AppleIcon className="w-3.5 h-3.5" />
         </button>
+
+        {!activeWindow && (
+          <span className="mr-4 font-medium">Hannah's Desktop</span>
+        )}
 
         {activeMenu === "apple" && (
           <div className={`absolute top-6 left-2 ${dropdownBgClass} rounded-lg shadow-xl ${textClass} py-1 w-56`}>
@@ -152,7 +160,7 @@ export default function Menubar({
             </button>
             <div className="border-t border-gray-700 my-1"></div>
             <button className={`w-full text-left px-4 py-1 ${hoverClass}`} onClick={onLogout}>
-              Log Out Daniel...
+              Log Out Hannah...
             </button>
           </div>
         )}
@@ -168,11 +176,29 @@ export default function Menubar({
       </div>
 
       <div className="flex items-center space-x-3">
-        <span className="mr-1">{batteryLevel}%</span>
+        {hasSpotifyOpen && onSpotifyClick && (
+          <button 
+            onClick={onSpotifyClick}
+            className="flex items-center justify-center hover:bg-white/10 px-0.5 py-0.5 rounded transition-colors -mr-1"
+            title="Spotify"
+          >
+            <img
+              src="/spotify.svg"
+              alt="Spotify"
+              className="w-4 h-4"
+              style={{
+                filter: isDarkMode ? "invert(1)" : "none",
+                opacity: 0.9,
+              }}
+            />
+          </button>
+        )}
+
+        <span className="mr-0.5">{batteryLevel}%</span>
         <div className="relative">
-          <div className="w-6 h-3 border border-current rounded-sm relative">
+          <div className="w-5 h-2.5 border border-current rounded-sm relative">
             <div className="absolute top-0 left-0 bottom-0 bg-current" style={{ width: `${batteryLevel}%` }}></div>
-            <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-2 bg-current rounded-r-sm"></div>
+            <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 w-0.5 h-1.5 bg-current rounded-r-sm"></div>
             {isCharging && <div className="absolute inset-0 flex items-center justify-center text-xs">⚡</div>}
           </div>
         </div>
@@ -187,7 +213,7 @@ export default function Menubar({
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="w-5 h-5"
+              className="w-4 h-4"
             >
               {wifiEnabled ? (
                 <>
@@ -227,14 +253,14 @@ export default function Menubar({
         </div>
 
         <button onClick={onSpotlightClick}>
-          <Search className="w-4 h-4" />
+          <Search className="w-3.5 h-3.5" />
         </button>
 
         <button onClick={onControlCenterClick} className="flex items-center justify-center">
           <img
             src="/control-center-icon.webp"
             alt="Control Center"
-            className="w-4 h-4"
+            className="w-3.5 h-3.5"
             style={{
               filter: isDarkMode ? "invert(1)" : "none",
               opacity: 0.9,
