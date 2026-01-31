@@ -528,8 +528,8 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
         )}
       </div>
 
-      {/* Resize handles - right edge and bottom-right corner for all windows except Files and Spotify */}
-      {!isMaximized && !isFiles && !isSpotify && !isMobile && (
+      {/* Resize handles - right edge and bottom-right corner for all windows except Spotify */}
+      {!isMaximized && !isSpotify && !isMobile && (
         <>
           {/* Right edge resize handle */}
           <div

@@ -18,7 +18,7 @@ export default function LinkedIn({ isDarkMode = true }: LinkedInProps) {
       hasOpenedRef.current = true
 
       // LinkedIn profile URL
-      const linkedinUrl = "https://www.linkedin.com/in/hannah-macdonald/"
+      const linkedinUrl = "https://www.linkedin.com/in/hannah-marie-macdonald/"
 
       // Open in new tab
       window.open(linkedinUrl, "_blank")

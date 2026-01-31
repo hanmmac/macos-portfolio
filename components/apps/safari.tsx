@@ -71,7 +71,7 @@ export default function Safari({ isDarkMode = true }: SafariProps) {
     },
     {
       title: "LinkedIn",
-      url: "https://linkedin.com",
+      url: "https://www.linkedin.com/in/hannah-marie-macdonald/",
       icon: "/new_linkedin_icon.png",
     },
     {
