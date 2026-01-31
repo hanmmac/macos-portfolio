@@ -433,18 +433,18 @@ export default function Desktop({
     }
     // Check if video window is already open
     const isOpen = openWindows.some((window) => window.id === "video-player")
-    
+
     if (!isOpen) {
       // Add window to the end of the array so it renders on top
       setOpenWindows((prev) => [...prev, videoWindow])
     }
-    
+
     // Use setTimeout to ensure state updates are processed
     setTimeout(() => {
       // Set as active window and bring to front with highest z-index
       setActiveWindow("video-player")
     }, 0)
-    
+
     // Close launchpad if open
     if (showLaunchpad) {
       setShowLaunchpad(false)
@@ -501,9 +501,9 @@ export default function Desktop({
     if (activeWindowId && windowsToClose.includes(activeWindowId)) {
       const remainingWindows = openWindows.filter((window) => !windowsToClose.includes(window.id))
       if (remainingWindows.length > 0) {
-        setActiveWindowId(remainingWindows[remainingWindows.length - 1].id)
+      setActiveWindowId(remainingWindows[remainingWindows.length - 1].id)
       } else {
-        setActiveWindowId(null)
+      setActiveWindowId(null)
       }
     }
   }
@@ -857,13 +857,13 @@ export default function Desktop({
               className="fixed inset-0 z-[55]"
               onClick={() => setShowControlCenter(false)}
             />
-            <ControlCenter
-              onClose={() => setShowControlCenter(false)}
-              isDarkMode={isDarkMode}
-              onToggleDarkMode={toggleDarkMode}
-              brightness={screenBrightness}
-              onBrightnessChange={updateBrightness}
-            />
+          <ControlCenter
+            onClose={() => setShowControlCenter(false)}
+            isDarkMode={isDarkMode}
+            onToggleDarkMode={toggleDarkMode}
+            brightness={screenBrightness}
+            onBrightnessChange={updateBrightness}
+          />
           </>
         )}
 

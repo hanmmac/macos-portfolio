@@ -315,15 +315,26 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
       // Save current state before maximizing
       setPreMaximizeState({ position, size })
 
-      // Get the available space (accounting for menubar)
-      const availableHeight = globalThis.window.innerHeight - 26 // 6px for menubar + 20px padding
+      if (isMobile) {
+        // Mobile: account for status bar (44px) and dock (80px)
+        const statusBarHeight = 44
+        const dockHeight = 80
+        setPosition({ x: 0, y: statusBarHeight })
+        setSize({
+          width: globalThis.window.innerWidth,
+          height: globalThis.window.innerHeight - statusBarHeight - dockHeight,
+        })
+      } else {
+        // Desktop: Get the available space (accounting for menubar)
+        const availableHeight = globalThis.window.innerHeight - 26 // 6px for menubar + 20px padding
 
-      // Maximize
-      setPosition({ x: 0, y: 26 }) // Position below menubar
-      setSize({
-        width: globalThis.window.innerWidth,
-        height: availableHeight - 70, // Account for dock
-      })
+        // Maximize
+        setPosition({ x: 0, y: 26 }) // Position below menubar
+        setSize({
+          width: globalThis.window.innerWidth,
+          height: availableHeight - 70, // Account for dock
+        })
+      }
     }
 
     setIsMaximized(!isMaximized)
@@ -411,12 +422,20 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
                 onClick={onClose}
                 className="text-white text-base font-medium active:opacity-70 touch-manipulation"
               >
-                Close
+                ✕
               </button>
               <div className={`flex-1 text-center text-base font-semibold ${isChat ? (isDarkMode ? "text-white" : "text-black") : "text-white"} font-sans`}>
                 {window.title}
               </div>
-              <div className="w-12"></div>
+              {isChat && (
+                <button
+                  onClick={toggleMaximize}
+                  className="text-white text-base font-medium active:opacity-70 touch-manipulation"
+                >
+                  {isMaximized ? "⊟" : "⊞"}
+                </button>
+              )}
+              {!isChat && <div className="w-12"></div>}
             </>
           ) : (
             // Desktop-style header
