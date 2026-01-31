@@ -58,6 +58,7 @@ export default function MobileDesktop({
   const [nextZIndex, setNextZIndex] = useState(30)
   const [showControlCenter, setShowControlCenter] = useState(false)
   const [isScrolling, setIsScrolling] = useState(false)
+  const [wifiEnabled, setWifiEnabled] = useState(true)
   const desktopRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -65,6 +66,14 @@ export default function MobileDesktop({
       setTime(new Date())
     }, 1000)
     return () => clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    // Load WiFi state from localStorage
+    const savedWifi = localStorage.getItem("wifiEnabled")
+    if (savedWifi !== null) {
+      setWifiEnabled(savedWifi === "true")
+    }
   }, [])
 
   useEffect(() => {
@@ -150,6 +159,15 @@ export default function MobileDesktop({
         size: { width: size.width, height: size.height },
       }
       openApp(projectWindow)
+    } else if (projectName === "air_pollution_analysis") {
+      const reportWindow: AppWindow = {
+        id: "air-pollution-analysis",
+        title: "Air Pollution Analysis Report",
+        component: "AirPollutionAnalysis",
+        position: { x: 0, y: size.y },
+        size: { width: size.width, height: size.height },
+      }
+      openApp(reportWindow)
     }
   }
 
@@ -183,6 +201,8 @@ export default function MobileDesktop({
       "dilo-spanish": ["dilo-spanish", "dilo-spanish-links", "dilo-spanish-desc"],
       "dilo-spanish-links": ["dilo-spanish", "dilo-spanish-links", "dilo-spanish-desc"],
       "dilo-spanish-desc": ["dilo-spanish", "dilo-spanish-links", "dilo-spanish-desc"],
+      "air-pollution-analysis": ["air-pollution-analysis", "air-pollution-desc"],
+      "air-pollution-desc": ["air-pollution-analysis", "air-pollution-desc"],
     }
 
     const projectGroup = projectGroups[id]
@@ -235,6 +255,38 @@ export default function MobileDesktop({
         <span className="text-[15px]">{formatTime(time)}</span>
       </div>
       <div className="flex items-center gap-1.5">
+        {/* WiFi Icon - same as desktop */}
+        <div className="flex items-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-4 h-4 text-white"
+          >
+            {wifiEnabled ? (
+              <>
+                <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+                <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+                <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+                <circle cx="12" cy="20" r="1" />
+              </>
+            ) : (
+              <>
+                <line x1="1" y1="1" x2="23" y2="23" />
+                <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
+                <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
+                <path d="M10.71 5.05A16 16 0 0 1 22.58 9" />
+                <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
+                <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+                <circle cx="12" cy="20" r="1" />
+              </>
+            )}
+          </svg>
+        </div>
         {/* Signal bars */}
         <div className="flex items-end gap-0.5">
           <div className="w-1 h-1.5 bg-white rounded-t-sm"></div>

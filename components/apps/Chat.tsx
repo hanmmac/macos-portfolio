@@ -15,15 +15,22 @@ type Message = {
 
 export default function ChatApp({ isDarkMode = true }: ChatAppProps) {
   // Glass effect styling similar to Spotify
-  const glassBg = "backdrop-blur-xl bg-white/5 dark:bg-black/20"
-  const textColor = "text-white"
+  // Keep background subtle - only add darker backdrop when in light mode and over very light backgrounds
+  const glassBg = isDarkMode 
+    ? "backdrop-blur-xl bg-white/5 dark:bg-black/20" 
+    : "backdrop-blur-xl bg-black/20 dark:bg-black/20" // Lighter backdrop, only darken when needed
+  // Keep text white by default - only darken when absolutely necessary (very light backgrounds)
+  // For now, keep white text and rely on backdrop for contrast
+  const textColor = "text-white" // Always white text
   const inputBg = isDarkMode ? "bg-white/10" : "bg-white/20"
-  const borderColor = "border-white/30"
+  const borderColor = isDarkMode ? "border-white/30" : "border-white/20"
   // White bubbles for assistant messages
   const assistantMessageBg = "bg-white"
   const assistantMessageText = "text-black"
-  // Light hazy blue for user messages
-  const userMessageBg = "backdrop-blur-md bg-blue-400/30"
+  // Light hazy blue for user messages - lighter blue
+  const userMessageBg = isDarkMode 
+    ? "backdrop-blur-md bg-blue-400/40" 
+    : "backdrop-blur-md bg-blue-400/50"
   const userMessageText = "text-white"
 
   const [messages, setMessages] = useState<Message[]>([
@@ -123,11 +130,11 @@ export default function ChatApp({ isDarkMode = true }: ChatAppProps) {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className={`${assistantMessageBg} ${assistantMessageText} rounded-lg px-4 py-2`}>
+            <div className="rounded-lg px-4 py-2">
               <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 bg-black rounded-full thinking-dot-1"></span>
-                <span className="w-2 h-2 bg-black rounded-full thinking-dot-2"></span>
-                <span className="w-2 h-2 bg-black rounded-full thinking-dot-3"></span>
+                <span className="w-2 h-2 bg-white rounded-full thinking-dot-1"></span>
+                <span className="w-2 h-2 bg-white rounded-full thinking-dot-2"></span>
+                <span className="w-2 h-2 bg-white rounded-full thinking-dot-3"></span>
               </div>
             </div>
           </div>
@@ -151,7 +158,7 @@ export default function ChatApp({ isDarkMode = true }: ChatAppProps) {
           <button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className={`bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors border ${borderColor}`}
+            className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-white/30"
           >
             <Send className="w-5 h-5" />
           </button>

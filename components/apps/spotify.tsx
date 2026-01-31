@@ -235,13 +235,13 @@ export default function Spotify({ isDarkMode = true, onClose }: SpotifyProps) {
           title="Close"
         >
           <X className="w-3 h-3 text-white" />
-        </button>
+          </button>
         
         {/* Track counter - top right */}
         <div className="absolute top-2 right-2 text-xs text-gray-400">
           {currentTrackIndex + 1}/{playlist.length} tracks
-        </div>
-        
+      </div>
+
         <div className="w-24 h-24 mb-0.5 rounded-md overflow-hidden shadow-lg">
           <img
             src={currentTrack.cover || "/placeholder.svg"}
@@ -276,7 +276,7 @@ export default function Spotify({ isDarkMode = true, onClose }: SpotifyProps) {
                     (currentTime / (duration || 1)) * 100
                   }%, #4D4D4D ${(currentTime / (duration || 1)) * 100}%, #4D4D4D 100%)`
                 : `linear-gradient(to right, #1f2937 0%, #1f2937 ${
-                    (currentTime / (duration || 1)) * 100
+                (currentTime / (duration || 1)) * 100
                   }%, #d1d5db ${(currentTime / (duration || 1)) * 100}%, #d1d5db 100%)`,
             }}
           />
@@ -315,25 +315,25 @@ export default function Spotify({ isDarkMode = true, onClose }: SpotifyProps) {
           </button>
 
           <div className="flex-1 relative">
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={isMuted ? 0 : volume}
-              onChange={handleVolumeChange}
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={isMuted ? 0 : volume}
+            onChange={handleVolumeChange}
               className={`w-full h-1 rounded-full appearance-none cursor-pointer ${isDarkMode ? "bg-gray-700" : "bg-gray-300"}`}
-              style={{
+            style={{
                 background: isDarkMode
                   ? `linear-gradient(to right, #ffffff 0%, #ffffff ${(isMuted ? 0 : volume) * 100}%, #4D4D4D ${
                       (isMuted ? 0 : volume) * 100
                     }%, #4D4D4D 100%)`
                   : `linear-gradient(to right, #1f2937 0%, #1f2937 ${(isMuted ? 0 : volume) * 100}%, #d1d5db ${
-                      (isMuted ? 0 : volume) * 100
+                (isMuted ? 0 : volume) * 100
                     }%, #d1d5db 100%)`,
-              }}
-            />
-          </div>
+            }}
+          />
+      </div>
 
           <button className={`p-0.5 rounded-full ${isDarkMode ? "hover:bg-gray-700/50" : "hover:bg-gray-300/50"} ml-1`}>
             <Volume2 className={`w-3 h-3 ${isDarkMode ? "text-white" : "text-gray-800"}`} />

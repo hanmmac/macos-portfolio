@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { ArrowLeft, ArrowRight, RefreshCw, Home, Star, Plus, Search, Wifi } from "lucide-react"
 
 interface SafariProps {
@@ -183,73 +184,189 @@ export default function Safari({ isDarkMode = true }: SafariProps) {
         {!wifiEnabled ? (
           <NoInternetView />
         ) : activeTab === "home" ? (
-          <div className={`${isDarkMode ? "bg-white" : "bg-white"} min-h-full`}>
-            <div className="p-8 text-gray-900">
-              <h1 className="text-3xl font-bold mb-4">Hi, I'm Hannah MacDonald</h1>
-              <p className="text-base mb-6">Product-Minded Data Scientist</p>
-              <hr className="mb-6 border-gray-300" />
-              <div className="space-y-4">
-                <section>
-                  <h2 className="text-xl font-semibold mb-2">About me</h2>
-                  <p className="mb-4 text-sm">
-                    I'm a recent grad from <span className="font-bold text-blue-900">UC Berkeley's Master's in Data Science</span> program, where I studied applied statistics, machine learning, and data engineering. I'm drawn to the overlap between data, AI, and user experience, especially projects where I can get creative with the problem - whether that's <span className="font-bold">designing experiments, product and feature ideation, or making complex analysis understandable</span>. What excites me most is building products people actually use, keeping the data story and user metrics front and center.
-                  </p>
-                  <p className="mb-4 text-sm">
-                    In my spare time, I'm constantly experimenting with AI to automate work and prototype ideas quickly. My current stack is Python + SQL + Supabase (Neo4j when graph structure helps), OpenAI APIs for LLM features, and Streamlit or lightweight React frontends. I use tools like Figma AI, Orchid, and Cursor to move fast from concept to working product, staying grounded in real data and production constraints while keeping things creative.
-                  </p>
-                </section>
-                <section>
-                  <h2 className="text-xl font-semibold mb-4">Skills</h2>
+          <div className="bg-white min-h-full">
+            {/* Hero Section */}
+            <div className="bg-white border-b border-gray-200">
+              <div className="max-w-6xl mx-auto px-8 py-12">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
+                  {/* Picture */}
+                  <div className="flex-shrink-0">
+                    <div className="w-44 h-44 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                      <Image
+                        src="/hannah-profile.png"
+                        alt="Hannah MacDonald"
+                        width={176}
+                        height={176}
+                        className="w-full h-full object-cover"
+                        priority
+                        style={{ objectPosition: 'center 20%' }}
+                      />
+                    </div>
+                  </div>
                   
-                  <div className="mb-6">
-                    <h3 className="text-base font-semibold mb-2">Data Science & Analytics</h3>
-                    <ul className="list-disc list-inside mb-4 space-y-1 text-sm">
-                      <li>Statistical modeling, regression, and causal inference</li>
-                      <li>Experimental design & A/B testing</li>
-                      <li>Feature engineering & model evaluation</li>
-                      <li>Data visualization & interpretability</li>
-                    </ul>
+                  {/* Text Content */}
+                  <div className="flex-1">
+                    <h1 className="text-4xl font-bold text-gray-900 mb-3">Hi, I'm Hannah MacDonald</h1>
+                    <div className="flex items-center gap-3 mb-4 flex-wrap">
+                      <p className="text-xl text-blue-600 font-medium">Product-Minded Data Scientist</p>
+                      <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full border border-blue-300 whitespace-nowrap">
+                        Open to Work
+                      </span>
+                    </div>
+                    <p className="text-base text-gray-700 leading-relaxed">
+                      I'm a data scientist and product-minded builder with a background in applied statistics, machine learning, and data engineering from <span className="font-semibold">UC Berkeley's Master of Information and Data Science program</span>. I'm drawn to work at the intersection of data, AI, and user experience - especially problems where creativity matters as much as rigor, whether that's designing experiments, shaping product direction, or translating complex analysis into something people can actually use.
+                    </p>
                   </div>
+                </div>
+              </div>
+            </div>
 
-                  <div className="mb-6">
-                    <h3 className="text-base font-semibold mb-2">Product & Engineering</h3>
-                    <ul className="list-disc list-inside mb-4 space-y-1 text-sm">
-                      <li>Python, R, SQL, JavaScript</li>
-                      <li>Rapid prototyping & MVP development</li>
-                      <li>User-centered design & iteration</li>
-                      <li>Responsible AI, privacy, and transparency considerations</li>
-                    </ul>
-                  </div>
-
-                  <div className="mb-6">
-                    <h3 className="text-base font-semibold mb-2">Machine Learning & AI</h3>
-                    <ul className="list-disc list-inside mb-4 space-y-1 text-sm">
-                      <li>Supervised learning & classification</li>
-                      <li>RAG systems & prompt design</li>
-                      <li>Model evaluation and bias analysis</li>
-                      <li>Python ML workflows (scikit-learn, pandas, NumPy)</li>
-                    </ul>
-                  </div>
-
-                  <div className="mb-6">
-                    <h3 className="text-base font-semibold mb-2">Data Engineering & Databases</h3>
-                    <ul className="list-disc list-inside mb-4 space-y-1 text-sm">
-                      <li>SQL (data modeling, transformations, analytics)</li>
-                      <li>Graph databases (Neo4j) & network analysis</li>
-                      <li>ETL pipelines & data cleaning</li>
-                      <li>API integration & structured data ingestion</li>
-                    </ul>
+            {/* Main Content */}
+            <div className="max-w-4xl mx-auto px-8 py-12">
+              <div className="space-y-8">
+                {/* Motivation & Interest Section */}
+                <section>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Motivation & Interest</h2>
+                  <div className="space-y-4 text-gray-700 leading-relaxed">
+                    <p className="text-base">
+                      What motivates me most is building products that don't stop at "interesting models," but make it into real workflows, with clear data stories and user metrics guiding decisions. I enjoy working close to the product, collaborating across design and engineering, and iterating quickly based on feedback and evidence.
+                    </p>
+                    <p className="text-base">
+                      In my spare time, I'm constantly experimenting with AI to prototype ideas and automate parts of my workflow. My current stack often includes Python, SQL, and Supabase (with Neo4j when graph structure helps), OpenAI APIs for LLM-driven features, and Streamlit or lightweight React frontends. I use tools like Figma AI, Orchid, Cursor, and Claude to move quickly from concept to working product - balancing speed, creativity, and production constraints.
+                    </p>
                   </div>
                 </section>
+
+                {/* Skills Section */}
                 <section>
-                  <h2 className="text-xl font-semibold mb-2">Education</h2>
-                  <p className="mb-2 text-sm">Master of Information and Data Science - UC Berkeley (GPA 3.9)</p>
-                  <p className="mb-4 text-sm">B.S. Statistics - University of Florida (GPA 3.7)</p>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-8">Skills</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="bg-blue-50 rounded-lg p-6 border border-gray-200">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Data Science & Analytics</h3>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>Statistical modeling, regression, and causal inference</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>Experimental design & A/B testing</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>Feature engineering & model evaluation</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>Data visualization & interpretability</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-blue-50 rounded-lg p-6 border border-gray-200">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Product & Engineering</h3>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>Python, R, SQL, JavaScript</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>Rapid prototyping & MVP development</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>User-centered design & iteration</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>Responsible AI, privacy, and transparency considerations</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-blue-50 rounded-lg p-6 border border-gray-200">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Machine Learning & AI</h3>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>Supervised learning & classification</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>RAG systems & prompt design</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>Model evaluation and bias analysis</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>Python ML workflows (scikit-learn, pandas, NumPy)</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-blue-50 rounded-lg p-6 border border-gray-200">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Data Engineering & Databases</h3>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>SQL (data modeling, transformations, analytics)</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>Graph databases (Neo4j) & network analysis</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>ETL pipelines & data cleaning</span>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-blue-600 mr-2">•</span>
+                          <span>API integration & structured data ingestion</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                 </section>
+
+                {/* Education Section */}
                 <section>
-                  <h2 className="text-xl font-semibold mb-2">Contact</h2>
-                  <p className="mb-2 text-sm">Email: <a href="mailto:hannahmarief15@gmail.com" className="text-blue-600 hover:underline">hannahmarief15@gmail.com</a></p>
-                  <p className="text-sm">LinkedIn: <a href="https://www.linkedin.com/in/hannah-marie-macdonald/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://www.linkedin.com/in/hannah-marie-macdonald/</a></p>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Education</h2>
+                  <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-base font-semibold text-gray-900">Master of Information and Data Science</p>
+                        <p className="text-sm text-gray-600">UC Berkeley (GPA 3.9)</p>
+                      </div>
+                      <div>
+                        <p className="text-base font-semibold text-gray-900">B.S. Statistics</p>
+                        <p className="text-sm text-gray-600">University of Florida (GPA 3.7)</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Contact Section */}
+                <section>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact</h2>
+                  <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm text-gray-600 mb-1">Email</p>
+                        <a href="mailto:hannahmarief15@gmail.com" className="text-base text-blue-600 hover:text-blue-700 hover:underline font-medium">
+                          hannahmarief15@gmail.com
+                        </a>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600 mb-1">LinkedIn</p>
+                        <a href="https://www.linkedin.com/in/hannah-marie-macdonald/" target="_blank" rel="noopener noreferrer" className="text-base text-blue-600 hover:text-blue-700 hover:underline font-medium">
+                          linkedin.com/in/hannah-marie-macdonald
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </section>
               </div>
             </div>
@@ -263,6 +380,10 @@ export default function Safari({ isDarkMode = true }: SafariProps) {
                 <section>
                   <p className="mb-4 text-sm">
                     This portfolio is an interactive macOS-inspired interface built to showcase my projects, product thinking, and data work in a way that feels playful but still usable.
+                  </p>
+                  <h2 className="text-lg font-semibold mb-3 mt-6">AI Chatbot</h2>
+                  <p className="mb-4 text-sm">
+                    The portfolio includes a RAG (Retrieval-Augmented Generation) chatbot that can answer questions about my background, projects, skills, and experience. The bot uses OpenAI for embeddings and completions, with Supabase and pgvector for vector storage. You can access it through the "Mac AI" app on the desktop or in the dock.
                   </p>
                   <h2 className="text-lg font-semibold mb-3 mt-6">Acknowledgments</h2>
                   <ul className="list-disc list-inside mb-4 space-y-1 text-sm">

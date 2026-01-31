@@ -88,6 +88,11 @@ export default function Spotlight({ onClose, onAppClick }: SpotlightProps) {
     const notesWidth = 600
     const notesHeight = 500
 
+    // Special size for Terminal - smaller window
+    const isTerminal = app.id === "terminal"
+    const terminalWidth = 600
+    const terminalHeight = 400
+
     // Special size for Analytics - larger window for dashboard
     const isAnalytics = app.id === "analytics"
     const analyticsWidth = 1000
@@ -95,29 +100,73 @@ export default function Spotlight({ onClose, onAppClick }: SpotlightProps) {
 
     // Special size for Chat - smaller window
     const isChat = app.id === "chat"
-    const chatWidth = 550
-    const chatHeight = 500
+    const chatWidth = 480
+    const chatHeight = 450
+    const chatScreenHeight = typeof window !== "undefined" ? window.innerHeight : 800
+    const chatY = chatScreenHeight - chatHeight - 150 // Increased padding to move window up
+    const chatX = 10 // More to the left
+
+    // Helper to ensure windows fit screen
+    const fitToScreen = (width: number, height: number, x: number, y: number) => {
+      const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1920
+      const screenHeight = typeof window !== "undefined" ? window.innerHeight : 1080
+      const menubarHeight = 26
+      const dockHeight = 80
+      const padding = 20
+      
+      const finalWidth = Math.min(width, screenWidth - padding * 2)
+      const finalHeight = Math.min(height, screenHeight - menubarHeight - dockHeight - padding * 2)
+      const finalX = Math.max(padding, Math.min(x, screenWidth - finalWidth - padding))
+      const finalY = Math.max(menubarHeight + padding, Math.min(y, screenHeight - finalHeight - dockHeight - padding))
+      
+      return { width: finalWidth, height: finalHeight, x: finalX, y: finalY }
+    }
+
+    let position, size
+    if (isSpotify) {
+      const fitted = fitToScreen(spotifyWidth, spotifyHeight, spotifyX, spotifyY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    } else if (isSafari) {
+      const fitted = fitToScreen(safariWidth, safariHeight, safariX, safariY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    } else if (isChat) {
+      const fitted = fitToScreen(chatWidth, chatHeight, chatX, chatY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    } else if (isNotes) {
+      const randomX = Math.random() * 200 + 100
+      const randomY = Math.random() * 100 + 50
+      const fitted = fitToScreen(notesWidth, notesHeight, randomX, randomY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    } else if (isTerminal) {
+      const randomX = Math.random() * 200 + 100
+      const randomY = Math.random() * 100 + 50
+      const fitted = fitToScreen(terminalWidth, terminalHeight, randomX, randomY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    } else if (isAnalytics) {
+      const randomX = Math.random() * 200 + 100
+      const randomY = Math.random() * 100 + 50
+      const fitted = fitToScreen(analyticsWidth, analyticsHeight, randomX, randomY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    } else {
+      const randomX = Math.random() * 200 + 100
+      const randomY = Math.random() * 100 + 50
+      const fitted = fitToScreen(800, 600, randomX, randomY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    }
 
     onAppClick({
       id: app.id,
       title: app.title,
       component: app.component,
-      position: isSpotify 
-        ? { x: spotifyX, y: spotifyY }
-        : isSafari
-        ? { x: safariX, y: safariY }
-        : { x: Math.random() * 200 + 100, y: Math.random() * 100 + 50 },
-      size: isSpotify 
-        ? { width: spotifyWidth, height: spotifyHeight }
-        : isSafari
-        ? { width: safariWidth, height: safariHeight }
-        : isNotes
-        ? { width: notesWidth, height: notesHeight }
-        : isAnalytics
-        ? { width: analyticsWidth, height: analyticsHeight }
-        : isChat
-        ? { width: chatWidth, height: chatHeight }
-        : { width: 800, height: 600 },
+      position,
+      size,
     })
     onClose()
   }

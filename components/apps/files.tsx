@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Folder, File, Image as ImageIcon, FileText, Music, Video } from "lucide-react"
-import type { AppWindow } from "@/types"
+import { Folder, FileText, Image as ImageIcon, File, Video, Music, Archive } from "lucide-react"
 
 interface FilesProps {
   isDarkMode?: boolean
@@ -15,19 +14,12 @@ export default function Files({ isDarkMode = false, onOpenProject, onMinimizeWin
   
   const textColor = isDarkMode ? "text-white" : "text-gray-800"
   const bgColor = isDarkMode ? "bg-gray-900" : "bg-white"
-  const sidebarBg = isDarkMode ? "bg-gray-800" : "bg-gray-100"
+  const sidebarBg = isDarkMode ? "bg-gray-800" : "bg-gray-50"
   const hoverBg = isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"
   const borderColor = isDarkMode ? "border-gray-700" : "border-gray-200"
   const cardBg = isDarkMode ? "bg-gray-800" : "bg-gray-50"
   const cardBorder = isDarkMode ? "border-gray-700" : "border-gray-200"
-
-  const folders = [
-    { name: "Documents", icon: Folder, count: 12 },
-    { name: "Downloads", icon: Folder, count: 8 },
-    { name: "Pictures", icon: Folder, count: 45 },
-    { name: "Music", icon: Folder, count: 23 },
-    { name: "Videos", icon: Folder, count: 5 },
-  ]
+  const sidebarHoverBg = isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"
 
   const files = [
     { 
@@ -62,21 +54,29 @@ export default function Files({ isDarkMode = false, onOpenProject, onMinimizeWin
     },
   ]
 
+  const documentTypes = [
+    { name: "All My Files", icon: Folder },
+    { name: "Documents", icon: FileText },
+    { name: "Images", icon: ImageIcon },
+    { name: "Videos", icon: Video },
+    { name: "Music", icon: Music },
+    { name: "Archives", icon: Archive },
+  ]
+
   return (
     <div className={`h-full flex ${bgColor} ${textColor}`}>
-      {/* Sidebar */}
+      {/* Left Sidebar - Document Types */}
       <div className={`w-48 ${sidebarBg} border-r ${borderColor} p-4`}>
-        <div className="mb-6">
-          <h3 className="font-semibold mb-2 text-sm">Favorites</h3>
+        <div className="mb-4">
+          <h3 className="text-xs font-semibold uppercase tracking-wider opacity-60 mb-2">Favorites</h3>
           <div className="space-y-1">
-            {folders.map((folder, index) => (
+            {documentTypes.map((type, index) => (
               <div
                 key={index}
-                className={`flex items-center gap-2 px-2 py-1.5 rounded ${hoverBg} cursor-pointer text-sm`}
+                className={`flex items-center gap-2 px-2 py-1.5 rounded ${sidebarHoverBg} cursor-pointer text-sm`}
               >
-                <folder.icon className="w-4 h-4" />
-                <span className="flex-1">{folder.name}</span>
-                <span className="text-xs opacity-60">{folder.count}</span>
+                <type.icon className="w-4 h-4 opacity-70" />
+                <span>{type.name}</span>
               </div>
             ))}
           </div>
@@ -99,7 +99,7 @@ export default function Files({ isDarkMode = false, onOpenProject, onMinimizeWin
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
                 onClick={() => {
-                  if ((file.name === "intelligent_ai_journal" || file.name === "bias_in_doctor_selection" || file.name === "graph_based_investment_insight" || file.name === "dilo_spanish_phrases") && onOpenProject) {
+                  if ((file.name === "intelligent_ai_journal" || file.name === "bias_in_doctor_selection" || file.name === "graph_based_investment_insight" || file.name === "dilo_spanish_phrases" || file.name === "air_pollution_analysis") && onOpenProject) {
                     onOpenProject(file.name)
                     // Minimize the Projects window
                     if (onMinimizeWindow) {

@@ -31,7 +31,7 @@ export default function LoginScreen({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin();
+      onLogin();
   };
 
   const formattedTime = time.toLocaleTimeString("en-US", {

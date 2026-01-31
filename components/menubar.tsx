@@ -18,6 +18,7 @@ interface MenubarProps {
   activeWindow: { id: string; title: string } | null
   onSpotifyClick?: () => void
   hasSpotifyOpen?: boolean
+  onToggleStickyNote?: () => void
 }
 
 export default function Menubar({
@@ -32,6 +33,7 @@ export default function Menubar({
   activeWindow,
   onSpotifyClick,
   hasSpotifyOpen,
+  onToggleStickyNote,
 }: MenubarProps) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const [batteryLevel, setBatteryLevel] = useState(100)
@@ -139,7 +141,17 @@ export default function Menubar({
         </button>
 
         {!activeWindow && (
-          <span className="mr-4 font-medium">Hannah's Desktop</span>
+          <>
+            <span className="mr-4 font-medium">Hannah's Desktop</span>
+            {onToggleStickyNote && (
+              <button
+                className="mr-4 font-medium hover:bg-white/10 px-2 py-0.5 rounded"
+                onClick={onToggleStickyNote}
+              >
+                Guide
+              </button>
+            )}
+          </>
         )}
 
         {activeMenu === "apple" && (
@@ -194,12 +206,15 @@ export default function Menubar({
           </button>
         )}
 
-        <span className="mr-0.5">{batteryLevel}%</span>
-        <div className="relative">
+        <div className="relative group">
           <div className="w-5 h-2.5 border border-current rounded-sm relative">
             <div className="absolute top-0 left-0 bottom-0 bg-current" style={{ width: `${batteryLevel}%` }}></div>
             <div className="absolute -right-0.5 top-1/2 transform -translate-y-1/2 w-0.5 h-1.5 bg-current rounded-r-sm"></div>
             {isCharging && <div className="absolute inset-0 flex items-center justify-center text-xs">⚡</div>}
+          </div>
+          {/* Battery percentage tooltip on hover */}
+          <div className="absolute top-6 right-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-black/70 text-white text-xs px-2 py-1 rounded">
+            {batteryLevel}%
           </div>
         </div>
 

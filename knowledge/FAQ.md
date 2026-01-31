@@ -47,3 +47,7 @@ Most of my side projects start small and practical. I like building just enough 
 Hannah has worked in data and analytics consulting, partnering with teams to analyze data, design experiments, and translate findings into clear recommendations for stakeholders. Her work focused on applying statistical and analytical methods to real-world business problems, often working across technical and non-technical teams.
 
 In addition to consulting, her experience includes building and shipping product-focused projects end-to-end, combining data science, AI, and user experience design.
+
+## What is Hannah’s education background?
+
+Hannah earned a Master of Information and Data Science from UC Berkeley (GPA 3.9), where she focused on applied statistics, machine learning, and data engineering with an emphasis on building product-oriented systems. She also holds a B.S. in Statistics from the University of Florida (GPA 3.7).

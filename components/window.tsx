@@ -22,6 +22,7 @@ import IntelligentAIJournal from "@/components/apps/intelligent-ai-journal"
 import VideoPlayer from "@/components/apps/video-player"
 import BiasDoctorLinks from "@/components/apps/bias-doctor-links"
 import BiasDoctorFinalReport from "@/components/apps/bias-doctor-final-report"
+import AirPollutionAnalysis from "@/components/apps/air-pollution-analysis"
 import Analytics from "@/components/apps/analytics"
 import HousingAffordability from "@/components/apps/housing-affordability"
 import GraphInvestment from "@/components/apps/graph-investment"
@@ -50,6 +51,7 @@ const componentMap: Record<string, React.ComponentType<{ isDarkMode?: boolean; o
   VideoPlayer,
   BiasDoctorLinks,
   BiasDoctorFinalReport,
+  AirPollutionAnalysis,
   Analytics,
   HousingAffordability,
   GraphInvestment,
@@ -142,7 +144,7 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
           // Resizing from right edge
           const proposedWidth = resizeStartSize.width + dx
           const rightEdge = position.x + proposedWidth
-          const maxAllowedRight = viewportWidth + resizeStartSize.width / 2
+          const maxAllowedRight = viewportWidth
           
           if (rightEdge <= maxAllowedRight) {
             newWidth = Math.max(minWidth, proposedWidth)
@@ -155,7 +157,7 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
           const proposedWidth = resizeStartSize.width - dx
           if (proposedWidth >= minWidth) {
             const proposedX = position.x + dx
-            const minX = -proposedWidth / 2
+            const minX = 0 // Don't allow window to go off left edge
             
             // Ensure the new position doesn't go too far left
             if (proposedX >= minX) {
@@ -169,7 +171,7 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
             
             // Additional check: ensure right edge doesn't go too far off screen
             const rightEdge = newX + newWidth
-            const maxAllowedRight = viewportWidth + newWidth / 2
+            const maxAllowedRight = viewportWidth
             if (rightEdge > maxAllowedRight) {
               newWidth = maxAllowedRight - newX
             }
@@ -181,7 +183,7 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
           // Resizing from bottom edge
           const proposedHeight = resizeStartSize.height + dy
           const bottomEdge = position.y + proposedHeight
-          const maxAllowedBottom = viewportHeight + resizeStartSize.height / 2
+          const maxAllowedBottom = viewportHeight
           
           if (bottomEdge <= maxAllowedBottom) {
             newHeight = Math.max(minHeight, proposedHeight)
@@ -194,7 +196,7 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
           const proposedHeight = resizeStartSize.height - dy
           if (proposedHeight >= minHeight) {
             const proposedY = position.y + dy
-            const minY = 24
+            const minY = 26 // Menu bar height
             
             // Ensure the new position doesn't go above menu bar
             if (proposedY >= minY) {
@@ -208,13 +210,40 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
             
             // Additional check: ensure bottom edge doesn't go too far off screen
             const bottomEdge = newY + newHeight
-            const maxAllowedBottom = viewportHeight + newHeight / 2
+            const maxAllowedBottom = viewportHeight
             if (bottomEdge > maxAllowedBottom) {
               newHeight = maxAllowedBottom - newY
             }
           }
         }
 
+        // Final constraints: ensure window stays within viewport
+        // Ensure left edge doesn't go negative
+        if (newX < 0) {
+          newWidth = newWidth + newX // Adjust width to compensate
+          newX = 0
+        }
+        
+        // Ensure right edge doesn't exceed viewport
+        if (newX + newWidth > viewportWidth) {
+          newWidth = viewportWidth - newX
+        }
+        
+        // Ensure top edge doesn't go above menubar
+        if (newY < 26) {
+          newHeight = newHeight + (newY - 26) // Adjust height to compensate
+          newY = 26
+        }
+        
+        // Ensure bottom edge doesn't exceed viewport
+        if (newY + newHeight > viewportHeight) {
+          newHeight = viewportHeight - newY
+        }
+        
+        // Ensure minimum dimensions are maintained
+        newWidth = Math.max(minWidth, newWidth)
+        newHeight = Math.max(minHeight, newHeight)
+        
         setSize({ width: newWidth, height: newHeight })
         // Update position for west and north resizing
         if (resizeDirection.includes("w") || resizeDirection.includes("n")) {
@@ -317,7 +346,7 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
   const isVideoPlayer = window.component === "VideoPlayer"
 
   const titleBarClass = isChat
-    ? "backdrop-blur-md bg-white/10 border-b border-white/20"
+    ? "backdrop-blur-md bg-white/10 border-b border-white/20" // Keep consistent styling, text stays white
     : isDarkMode
     ? isActive
       ? "bg-gray-800"
@@ -384,7 +413,7 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
               >
                 Close
               </button>
-              <div className={`flex-1 text-center text-base font-semibold ${isChat ? "text-white" : "text-white"} font-sans`}>
+              <div className={`flex-1 text-center text-base font-semibold ${isChat ? (isDarkMode ? "text-white" : "text-black") : "text-white"} font-sans`}>
                 {window.title}
               </div>
               <div className="w-12"></div>
@@ -415,7 +444,7 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
                 )}
               </div>
 
-              <div className={`flex-1 text-center text-sm font-medium truncate ${isChat ? "text-white" : textClass} font-sans`}>{window.title}</div>
+              <div className={`flex-1 text-center text-sm font-medium truncate ${isChat ? (isDarkMode ? "text-white" : "text-black") : textClass} font-sans`}>{window.title}</div>
             </>
           )}
 
@@ -450,7 +479,7 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
                 </button>
               )}
               <button
-                className={`p-1 rounded ${isChat ? "hover:bg-white/20 text-white" : isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
+                className={`p-1 rounded ${isChat ? (isDarkMode ? "hover:bg-white/20 text-white" : "hover:bg-black/10 text-black") : isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
                 onClick={(e) => {
                   e.stopPropagation()
                   handleZoomOut()
@@ -459,9 +488,9 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
               >
                 <ZoomOut className="w-3 h-3" />
               </button>
-              <span className={`text-xs px-1 ${isChat ? "text-white" : ""}`}>{zoomLevel}%</span>
+              <span className={`text-xs px-1 ${isChat ? (isDarkMode ? "text-white" : "text-black") : ""}`}>{zoomLevel}%</span>
               <button
-                className={`p-1 rounded ${isChat ? "hover:bg-white/20 text-white" : isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
+                className={`p-1 rounded ${isChat ? (isDarkMode ? "hover:bg-white/20 text-white" : "hover:bg-black/10 text-black") : isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
                 onClick={(e) => {
                   e.stopPropagation()
                   handleZoomIn()
@@ -499,13 +528,18 @@ export default function Window({ window, isActive, onClose, onFocus, onMinimize,
         )}
       </div>
 
-      {/* Resize handles - hidden on mobile */}
+      {/* Resize handles - right edge and bottom-right corner for all windows except Files and Spotify */}
       {!isMaximized && !isFiles && !isSpotify && !isMobile && (
         <>
-          {/* Right edge resize handle only */}
+          {/* Right edge resize handle */}
           <div
             className="absolute right-0 top-0 bottom-0 w-2 cursor-e-resize z-20"
             onMouseDown={(e) => handleResizeMouseDown(e, "e")}
+          />
+          {/* Bottom-right corner resize handle */}
+          <div
+            className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize z-20"
+            onMouseDown={(e) => handleResizeMouseDown(e, "se")}
           />
         </>
       )}

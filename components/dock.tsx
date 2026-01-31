@@ -31,10 +31,31 @@ interface DockProps {
 }
 
 export default function Dock({ onAppClick, onLaunchpadClick, activeAppIds, minimizedWindows, onRestoreWindow, openWindows, isDarkMode }: DockProps) {
+  // Check if Projects/Files window is open
+  const filesWindow = openWindows.find((w) => w.component === "Files")
+  
+  // Check if any project window is open (project windows or project description windows)
+  const hasProjectWindowsOpen = openWindows.some((w) => 
+    w.component === "IntelligentAIJournal" ||
+    w.component === "BiasDoctorFinalReport" ||
+    w.component === "BiasDoctorLinks" ||
+    w.component === "GraphInvestment" ||
+    w.component === "GraphInvestmentLinks" ||
+    w.component === "DiloSpanish" ||
+    w.component === "DiloSpanishLinks" ||
+    w.component === "AirPollutionAnalysis" ||
+    w.component === "ProjectDescription"
+  )
+  
+  // Show Projects folder if Files window is open OR any project window is open
+  const shouldShowProjectsFolder = !!filesWindow || hasProjectWindowsOpen
+  const hasProjectsOpen = !!filesWindow
+  
   const [mouseX, setMouseX] = useState<number | null>(null)
   const dockRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [showMacTooltip, setShowMacTooltip] = useState(true)
 
   // Check if we're on a mobile device
   useEffect(() => {
@@ -64,9 +85,90 @@ export default function Dock({ onAppClick, onLaunchpadClick, activeAppIds, minim
     }
   }, [showMobileMenu])
 
+  // Close Mac tooltip when clicking anywhere on screen or any window
+  useEffect(() => {
+    if (!showMacTooltip || !hasProjectsOpen) return
+
+    const handleClickAnywhere = () => {
+      setShowMacTooltip(false)
+    }
+
+    // Add listener with a small delay to avoid closing immediately when opening project
+    const timeoutId = setTimeout(() => {
+      document.addEventListener("mousedown", handleClickAnywhere, true)
+    }, 100)
+
+    return () => {
+      clearTimeout(timeoutId)
+      document.removeEventListener("mousedown", handleClickAnywhere, true)
+    }
+  }, [showMacTooltip, hasProjectsOpen])
+
   const handleAppClick = (app: (typeof dockApps)[0]) => {
     if (app.id === "launchpad") {
       onLaunchpadClick()
+      return
+    }
+
+    // Check if window is minimized - if so, restore it first
+    const existingWindow = openWindows.find((w) => w.id === app.id)
+    if (existingWindow && minimizedWindows.includes(app.id)) {
+      onRestoreWindow(app.id)
+      return
+    }
+
+    // Special handling for Chat when projects are open
+    const isChat = app.id === "chat"
+    if (isChat && hasProjectsOpen) {
+      // Hide tooltip when clicking Mac icon
+      setShowMacTooltip(false)
+      
+      // Find the project description window to match its size and position
+      const projectDescWindow = openWindows.find((w) => w.component === "ProjectDescription")
+      
+      if (projectDescWindow) {
+        // Use same width as project description window (both are wider now)
+        const chatWidth = projectDescWindow.size.width
+        const chatHeight = Math.min(400, projectDescWindow.size.height * 0.95) // A little longer
+        const gap = 10 // Closer to project description
+        
+        // Position overlapping the project description slightly, aligned with it
+        // Ensure it doesn't go below the dock (dock is at bottom, ~80px height)
+        const screenHeight = typeof window !== "undefined" ? window.innerHeight : 1080
+        const dockHeight = 80
+        const maxY = screenHeight - chatHeight - dockHeight - 10 // Leave 10px gap above dock
+        
+        const chatX = projectDescWindow.position.x
+        const calculatedY = projectDescWindow.position.y + projectDescWindow.size.height - 40 // Overlap by 40px
+        const chatY = Math.min(calculatedY, maxY) // Ensure it doesn't go below dock
+        
+        // Open or move chat window to match project description size and position below it
+        onAppClick({
+          id: "chat",
+          title: "Mac - Hannah's portfolio assistant",
+          component: "ChatApp",
+          position: { x: chatX, y: chatY },
+          size: { width: chatWidth, height: chatHeight },
+        })
+      } else {
+        // Fallback if no project description window found
+        const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1920
+        const screenHeight = typeof window !== "undefined" ? window.innerHeight : 1080
+        const chatWidth = 450
+        const chatHeight = 350
+        const dockHeight = 80
+        const padding = 20
+        const chatX = screenWidth - chatWidth - padding
+        const chatY = screenHeight - chatHeight - dockHeight - padding
+        
+        onAppClick({
+          id: "chat",
+          title: "Mac - Hannah's portfolio assistant",
+          component: "ChatApp",
+          position: { x: chatX, y: chatY },
+          size: { width: chatWidth, height: chatHeight },
+        })
+      }
       return
     }
 
@@ -94,29 +196,74 @@ export default function Dock({ onAppClick, onLaunchpadClick, activeAppIds, minim
     const notesWidth = 600
     const notesHeight = 500
 
-    // Special size for Chat - smaller window
-    const isChat = app.id === "chat"
-    const chatWidth = 550
-    const chatHeight = 500
+    // Special size for Terminal - smaller window
+    const isTerminal = app.id === "terminal"
+    const terminalWidth = 600
+    const terminalHeight = 400
+
+    // Special size for Chat - smaller window (default behavior when projects not open)
+    const chatWidth = 480
+    const chatHeight = 450
+    // Reuse screenHeight from Safari section above, or calculate if not already defined
+    const chatScreenHeight = typeof window !== "undefined" ? window.innerHeight : 800
+    const chatY = chatScreenHeight - chatHeight - 150 // Increased padding to move window up
+    const chatX = 10 // More to the left
+
+    // Helper to ensure windows fit screen
+    const fitToScreen = (width: number, height: number, x: number, y: number) => {
+      const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1920
+      const screenHeight = typeof window !== "undefined" ? window.innerHeight : 1080
+      const menubarHeight = 26
+      const dockHeight = 80
+      const padding = 20
+      
+      const finalWidth = Math.min(width, screenWidth - padding * 2)
+      const finalHeight = Math.min(height, screenHeight - menubarHeight - dockHeight - padding * 2)
+      const finalX = Math.max(padding, Math.min(x, screenWidth - finalWidth - padding))
+      const finalY = Math.max(menubarHeight + padding, Math.min(y, screenHeight - finalHeight - dockHeight - padding))
+      
+      return { width: finalWidth, height: finalHeight, x: finalX, y: finalY }
+    }
+
+    let position, size
+    if (isSpotify) {
+      const fitted = fitToScreen(spotifyWidth, spotifyHeight, spotifyX, spotifyY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    } else if (isSafari) {
+      const fitted = fitToScreen(safariWidth, safariHeight, safariX, safariY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    } else if (isChat) {
+      const fitted = fitToScreen(chatWidth, chatHeight, chatX, chatY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    } else if (isNotes) {
+      const randomX = Math.random() * 200 + 100
+      const randomY = Math.random() * 100 + 50
+      const fitted = fitToScreen(notesWidth, notesHeight, randomX, randomY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    } else if (isTerminal) {
+      const randomX = Math.random() * 200 + 100
+      const randomY = Math.random() * 100 + 50
+      const fitted = fitToScreen(terminalWidth, terminalHeight, randomX, randomY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    } else {
+      const randomX = Math.random() * 200 + 100
+      const randomY = Math.random() * 100 + 50
+      const fitted = fitToScreen(800, 600, randomX, randomY)
+      position = { x: fitted.x, y: fitted.y }
+      size = { width: fitted.width, height: fitted.height }
+    }
 
     onAppClick({
       id: app.id,
       title: app.title,
       component: app.component,
-      position: isSpotify 
-        ? { x: spotifyX, y: spotifyY }
-        : isSafari
-        ? { x: safariX, y: safariY }
-        : { x: Math.random() * 200 + 100, y: Math.random() * 100 + 50 },
-      size: isSpotify 
-        ? { width: spotifyWidth, height: spotifyHeight }
-        : isSafari
-        ? { width: safariWidth, height: safariHeight }
-        : isNotes
-        ? { width: notesWidth, height: notesHeight }
-        : isChat
-        ? { width: chatWidth, height: chatHeight }
-        : { width: 800, height: 600 },
+      position,
+      size,
     })
 
     // Close mobile menu after clicking an app
@@ -162,8 +309,7 @@ export default function Dock({ onAppClick, onLaunchpadClick, activeAppIds, minim
     return scale
   }
 
-  // Check if Files/Projects window is open (minimized or not)
-  const filesWindow = openWindows.find((w) => w.component === "Files")
+  // Check if Files/Projects window is minimized
   const isFilesMinimized = filesWindow ? minimizedWindows.includes(filesWindow.id) : false
   
   // For mobile, we'll show only the first 4 apps plus a "more" button
@@ -212,7 +358,8 @@ export default function Dock({ onAppClick, onLaunchpadClick, activeAppIds, minim
         onMouseLeave={handleMouseLeave}
       >
         {visibleApps.map((app, index) => {
-          const scale = getIconScale(index, visibleApps.length + (filesWindow ? 1 : 0))
+          const scale = getIconScale(index, visibleApps.length + (shouldShowProjectsFolder ? 1 : 0))
+          const isChat = app.id === "chat"
 
           return (
             <div
@@ -240,8 +387,20 @@ export default function Dock({ onAppClick, onLaunchpadClick, activeAppIds, minim
                   draggable="false"
                 />
 
+                {/* Special tooltip for Mac chatbot when projects are open */}
+                {!isMobile && isChat && hasProjectsOpen && showMacTooltip && (
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black/80 text-white text-xs rounded-lg whitespace-nowrap font-sans shadow-lg z-50">
+                    <div className="text-center mb-1">Ask projects questions with Mac</div>
+                    <div className="flex justify-center">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
+                    </div>
+                  </div>
+                )}
+
                 {/* Tooltip - only on desktop */}
-                {!isMobile && scale > 1.5 && (
+                {!isMobile && scale > 1.5 && !(isChat && hasProjectsOpen) && (
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-black/70 text-white text-xs rounded whitespace-nowrap font-sans">
                     {app.title}
                   </div>
@@ -256,19 +415,47 @@ export default function Dock({ onAppClick, onLaunchpadClick, activeAppIds, minim
           )
         })}
 
-        {/* Projects/Files window icon when open (show in main dock, not in minimized section) */}
-        {filesWindow && !isFilesMinimized && (
+        {/* Projects/Files window icon when open or any project window is open (show in main dock, not in minimized section) */}
+        {shouldShowProjectsFolder && (!filesWindow || !isFilesMinimized) && (
           <div
             className={`flex flex-col items-center justify-end h-full ${isMobile ? "px-3" : "px-2"}`}
             onClick={() => {
-              // Focus the Files window
-              onAppClick({
-                id: filesWindow.id,
-                title: filesWindow.title,
-                component: filesWindow.component,
-                position: filesWindow.position,
-                size: filesWindow.size,
-              })
+              if (filesWindow) {
+                if (isFilesMinimized) {
+                  // Restore the Files window if it's minimized
+                  onRestoreWindow(filesWindow.id)
+                } else {
+                  // Focus the Files window if it exists and is not minimized
+                  onAppClick({
+                    id: filesWindow.id,
+                    title: filesWindow.title,
+                    component: filesWindow.component,
+                    position: filesWindow.position,
+                    size: filesWindow.size,
+                  })
+                }
+              } else {
+                // Open the Files window if it doesn't exist
+                const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1920
+                const screenHeight = typeof window !== "undefined" ? window.innerHeight : 1080
+                const menubarHeight = 26
+                const dockHeight = 80
+                const padding = 20
+                const gap = 20
+                const descWidth = 400
+                const filesWidth = Math.min(880, screenWidth - descWidth - gap - padding * 2)
+                const filesHeight = Math.min(700, screenHeight - menubarHeight - dockHeight - padding * 2)
+                const filesX = padding
+                const filesY = menubarHeight + padding
+                
+                onAppClick({
+                  id: "files",
+                  title: "Projects",
+                  component: "Files",
+                  position: { x: filesX, y: filesY },
+                  size: { width: filesWidth, height: filesHeight },
+                })
+              }
             }}
           >
             <div
@@ -281,13 +468,13 @@ export default function Dock({ onAppClick, onLaunchpadClick, activeAppIds, minim
             >
               <img
                 src="/mac_blue_folder.png"
-                alt={filesWindow.title}
+                alt={filesWindow?.title || "Projects"}
                 className={`object-contain ${isMobile ? "w-14 h-14" : "w-12 h-12"}`}
                 draggable="false"
               />
 
               {/* Indicator dot for active window */}
-              {activeAppIds.includes(filesWindow.id) && (
+              {filesWindow && activeAppIds.includes(filesWindow.id) && (
                 <div className="absolute bottom-[-5px] left-1/2 transform -translate-x-1/2 w-1 h-1 bg-white rounded-full"></div>
               )}
             </div>
