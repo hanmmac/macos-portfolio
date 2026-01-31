@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Folder, FileText, Image as ImageIcon, File, Video, Music, Archive } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface FilesProps {
   isDarkMode?: boolean
@@ -11,6 +12,8 @@ interface FilesProps {
 
 export default function Files({ isDarkMode = false, onOpenProject, onMinimizeWindow }: FilesProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [pressedIndex, setPressedIndex] = useState<number | null>(null)
+  const isMobile = useIsMobile()
   
   const textColor = isDarkMode ? "text-white" : "text-gray-800"
   const bgColor = isDarkMode ? "bg-gray-900" : "bg-white"
@@ -65,23 +68,25 @@ export default function Files({ isDarkMode = false, onOpenProject, onMinimizeWin
 
   return (
     <div className={`h-full flex ${bgColor} ${textColor}`}>
-      {/* Left Sidebar - Document Types */}
-      <div className={`w-48 ${sidebarBg} border-r ${borderColor} p-4`}>
-        <div className="mb-4">
-          <h3 className="text-xs font-semibold uppercase tracking-wider opacity-60 mb-2">Favorites</h3>
-          <div className="space-y-1">
-            {documentTypes.map((type, index) => (
-              <div
-                key={index}
-                className={`flex items-center gap-2 px-2 py-1.5 rounded ${sidebarHoverBg} cursor-pointer text-sm`}
-              >
-                <type.icon className="w-4 h-4 opacity-70" />
-                <span>{type.name}</span>
-              </div>
-            ))}
+      {/* Left Sidebar - Document Types - Hidden on mobile */}
+      {!isMobile && (
+        <div className={`w-48 ${sidebarBg} border-r ${borderColor} p-4`}>
+          <div className="mb-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wider opacity-60 mb-2">Favorites</h3>
+            <div className="space-y-1">
+              {documentTypes.map((type, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center gap-2 px-2 py-1.5 rounded ${sidebarHoverBg} cursor-pointer text-sm`}
+                >
+                  <type.icon className="w-4 h-4 opacity-70" />
+                  <span>{type.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 p-6 flex gap-6">
@@ -92,31 +97,80 @@ export default function Files({ isDarkMode = false, onOpenProject, onMinimizeWin
           </div>
 
           <div className="flex flex-col gap-2">
-            {files.map((file, index) => (
-              <div
-                key={index}
-                className="relative"
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                onClick={() => {
-                  if ((file.name === "intelligent_ai_journal" || file.name === "bias_in_doctor_selection" || file.name === "graph_based_investment_insight" || file.name === "dilo_spanish_phrases" || file.name === "air_pollution_analysis") && onOpenProject) {
-                    onOpenProject(file.name)
-                  }
-                }}
-              >
+            {files.map((file, index) => {
+              const isPollution = file.name === "air_pollution_analysis"
+              const isPressed = pressedIndex === index
+              
+              return (
                 <div
-                  className={`flex items-center gap-3 p-3 rounded-lg border ${borderColor} ${hoverBg} cursor-pointer`}
+                  key={index}
+                  className="relative"
+                  onMouseEnter={() => !isMobile && setHoveredIndex(index)}
+                  onMouseLeave={() => !isMobile && setHoveredIndex(null)}
+                  onMouseDown={() => isMobile && !isPollution && setPressedIndex(index)}
+                  onMouseUp={() => isMobile && setPressedIndex(null)}
+                  onTouchStart={() => isMobile && !isPollution && setPressedIndex(index)}
+                  onTouchEnd={() => isMobile && setPressedIndex(null)}
+                  onClick={() => {
+                    // On mobile, don't open pollution project
+                    if (isMobile && isPollution) {
+                      return
+                    }
+                    
+                    if ((file.name === "intelligent_ai_journal" || file.name === "bias_in_doctor_selection" || file.name === "graph_based_investment_insight" || file.name === "dilo_spanish_phrases" || file.name === "air_pollution_analysis") && onOpenProject) {
+                      onOpenProject(file.name)
+                    }
+                  }}
                 >
-                  <file.icon className="w-8 h-8 opacity-80 flex-shrink-0" />
-                  <span className="text-sm">{file.name}</span>
+                  <div
+                    className={`flex items-start gap-3 p-3 rounded-lg border ${borderColor} ${hoverBg} ${
+                      isMobile ? "flex-col" : ""
+                    } ${
+                      isMobile && isPressed && !isPollution ? "shadow-lg transform scale-[0.98]" : ""
+                    } ${
+                      isMobile && isPollution ? "cursor-default" : "cursor-pointer"
+                    } transition-all`}
+                  >
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <file.icon className="w-8 h-8 opacity-80 flex-shrink-0" />
+                      <span className="text-sm font-medium">{file.name}</span>
+                    </div>
+                    
+                    {/* Mobile: Show description and tools directly in card */}
+                    {isMobile && (
+                      <div className="w-full mt-2 space-y-2">
+                        {file.description && (
+                          <p className="text-xs opacity-80 leading-relaxed">
+                            {file.description}
+                          </p>
+                        )}
+                        {file.info && (
+                          <div className="flex flex-wrap gap-2">
+                            {file.info.split(" | ").map((tech, techIndex) => (
+                              <span
+                                key={techIndex}
+                                className={`px-2 py-1 rounded text-xs ${
+                                  isDarkMode 
+                                    ? "bg-gray-700 text-gray-200" 
+                                    : "bg-gray-200 text-gray-800"
+                                }`}
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
-        {/* Info Card */}
-        {hoveredIndex !== null && files[hoveredIndex]?.info && (
+        {/* Info Card - Desktop only */}
+        {!isMobile && hoveredIndex !== null && files[hoveredIndex]?.info && (
           <div 
             className={`w-80 max-h-full overflow-y-auto ${cardBg} border ${cardBorder} rounded-lg p-4 shadow-lg`}
             onMouseEnter={() => setHoveredIndex(hoveredIndex)}
