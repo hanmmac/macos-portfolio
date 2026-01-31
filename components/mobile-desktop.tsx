@@ -120,25 +120,9 @@ export default function MobileDesktop({
     if (!isOpen) {
       const size = getFullScreenSize()
       
-      // Special positioning for chatbot - below "About me" button
-      const isChat = appId === "chat"
+      // All apps open full screen on mobile (including chatbot)
       let windowPosition = { x: 0, y: size.y }
       let windowSize = { width: size.width, height: size.height }
-      
-      if (isChat) {
-        // Calculate position below "About me" button
-        // Status bar: 44px, top padding: 16px, resume icon: 320px, margin: 24px, button height: ~56px
-        const aboutMeButtonBottom = 44 + 16 + 320 + 24 + 56
-        const spacing = 20 // Space below button
-        const chatY = aboutMeButtonBottom + spacing
-        
-        // Make chatbot window smaller, not full screen
-        const chatWidth = size.width
-        const chatHeight = size.height - chatY - 20 // Leave some space at bottom
-        
-        windowPosition = { x: 0, y: chatY }
-        windowSize = { width: chatWidth, height: chatHeight }
-      }
       
       const newWindow: AppWindow = {
         id: appId,
