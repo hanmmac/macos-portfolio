@@ -13,9 +13,9 @@ export default function BootScreen() {
           clearInterval(interval)
           return 100
         }
-        return prev + 10
+        return prev + 15
       })
-    }, 300)
+    }, 200)
 
     return () => clearInterval(interval)
   }, [])

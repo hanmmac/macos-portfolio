@@ -22,7 +22,7 @@ export default function Home() {
     if (systemState === "booting") {
       const timer = setTimeout(() => {
         setSystemState("login")
-      }, 3000) // 3 seconds boot sequence
+      }, 2000) // 2 seconds boot sequence (faster)
 
       return () => clearTimeout(timer)
     }
@@ -31,7 +31,7 @@ export default function Home() {
       // First show boot screen
       const bootTimer = setTimeout(() => {
         setSystemState("login")
-      }, 3000) // 3 seconds boot sequence
+      }, 2000) // 2 seconds boot sequence (faster)
 
       return () => clearTimeout(bootTimer)
     }
