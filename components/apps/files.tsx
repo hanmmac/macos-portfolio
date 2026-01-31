@@ -101,10 +101,6 @@ export default function Files({ isDarkMode = false, onOpenProject, onMinimizeWin
                 onClick={() => {
                   if ((file.name === "intelligent_ai_journal" || file.name === "bias_in_doctor_selection" || file.name === "graph_based_investment_insight" || file.name === "dilo_spanish_phrases" || file.name === "air_pollution_analysis") && onOpenProject) {
                     onOpenProject(file.name)
-                    // Minimize the Projects window
-                    if (onMinimizeWindow) {
-                      onMinimizeWindow()
-                    }
                   }
                 }}
               >

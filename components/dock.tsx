@@ -129,7 +129,7 @@ export default function Dock({ onAppClick, onLaunchpadClick, activeAppIds, minim
       if (projectDescWindow) {
         // Use same width as project description window (both are wider now)
         const chatWidth = projectDescWindow.size.width
-        const chatHeight = Math.min(400, projectDescWindow.size.height * 0.95) // A little longer
+        const chatHeight = Math.min(500, projectDescWindow.size.height * 1.1) // Bigger chat window
         const gap = 10 // Closer to project description
         
         // Position overlapping the project description slightly, aligned with it
@@ -154,8 +154,8 @@ export default function Dock({ onAppClick, onLaunchpadClick, activeAppIds, minim
         // Fallback if no project description window found
         const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1920
         const screenHeight = typeof window !== "undefined" ? window.innerHeight : 1080
-        const chatWidth = 450
-        const chatHeight = 350
+        const chatWidth = 500
+        const chatHeight = 450
         const dockHeight = 80
         const padding = 20
         const chatX = screenWidth - chatWidth - padding
@@ -202,8 +202,8 @@ export default function Dock({ onAppClick, onLaunchpadClick, activeAppIds, minim
     const terminalHeight = 400
 
     // Special size for Chat - smaller window (default behavior when projects not open)
-    const chatWidth = 480
-    const chatHeight = 450
+    const chatWidth = 520
+    const chatHeight = 500
     // Reuse screenHeight from Safari section above, or calculate if not already defined
     const chatScreenHeight = typeof window !== "undefined" ? window.innerHeight : 800
     const chatY = chatScreenHeight - chatHeight - 150 // Increased padding to move window up
@@ -402,7 +402,7 @@ export default function Dock({ onAppClick, onLaunchpadClick, activeAppIds, minim
                 {/* Tooltip - only on desktop */}
                 {!isMobile && scale > 1.5 && !(isChat && hasProjectsOpen) && (
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-black/70 text-white text-xs rounded whitespace-nowrap font-sans">
-                    {app.title}
+                    {isChat ? "Ask Mac" : app.title}
                   </div>
                 )}
 

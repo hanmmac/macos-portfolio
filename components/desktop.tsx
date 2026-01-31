@@ -192,25 +192,13 @@ export default function Desktop({
       setActiveWindowId(app.id)
       setWindowZIndex((prev) => {
         const newMap = new Map(prev)
-        // Find the highest z-index among all open windows (excluding dock which is z-50)
-        // Check all open windows and get their actual z-indices (using defaults if not set)
-        const allZIndices = openWindows
-          .filter(w => w.id !== app.id)
-          .map(w => {
-            const z = prev.get(w.id)
-            // Use default z-index if not set (30 for normal windows, 40 for Spotify)
-            return z !== undefined ? z : (w.component === "Spotify" ? 40 : 30)
-          })
-          .filter(z => z < 50) // Exclude dock (z-50)
-        
-        const maxZ = allZIndices.length > 0 ? Math.max(...allZIndices) : 20
-        // Set to max + 1, but cap at 45 to ensure it stays below dock (z-50)
+        // Use nextZIndex to ensure it's higher than all other windows, but cap at 45 to stay below dock (z-50)
         // This brings it to the front of all other windows while staying behind dock
-        const newZ = Math.min(45, Math.max(20, maxZ + 1))
+        const newZ = Math.min(45, Math.max(20, nextZIndex))
         newMap.set(app.id, newZ)
         return newMap
       })
-      // Also increment nextZIndex to maintain proper ordering
+      // Increment nextZIndex to maintain proper ordering
       setNextZIndex((prev) => prev + 1)
     } else {
       // Set as active window and bring to front with normal z-index
@@ -224,12 +212,6 @@ export default function Desktop({
   }
 
   const openProject = (projectName: string) => {
-    // Minimize the Projects window
-    const projectsWindow = openWindows.find((w) => w.id === "files")
-    if (projectsWindow) {
-      minimizeWindow("files")
-    }
-
     if (projectName === "intelligent_ai_journal") {
       const screenWidth = typeof window !== "undefined" ? window.innerWidth : 1920
       const screenHeight = typeof window !== "undefined" ? window.innerHeight : 1080
@@ -635,8 +617,8 @@ export default function Desktop({
                 const menubarHeight = 26
                 const dockHeight = 80
                 const padding = 20
-                const chatWidth = 480
-                const chatHeight = 450
+                const chatWidth = 520
+                const chatHeight = 500
                 
                 // Ensure window fits screen
                 const finalWidth = Math.min(chatWidth, screenWidth - padding * 2)
